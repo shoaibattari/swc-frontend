@@ -7,7 +7,7 @@ import {
 } from "react";
 import { toast } from "react-toastify";
 import apis from "../config/api";
-import { useMutation } from "react-query";
+import { useMutation } from "@tanstack/react-query";
 
 // Initial state
 const initialAuthState = {
