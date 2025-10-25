@@ -2,23 +2,8 @@ import "./App.css";
 
 function App() {
   return (
-    <div className="relative  flex flex-col justify-center items-center text-center font-outfit overflow-hidden">
-      <video
-        autoPlay
-        loop
-        // muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-contain opacity-50"
-      >
-        <source src="/video.mp4" type="video/mp4" />
-        {/* fallback text */}
-        Your browser does not support the video tag.
-      </video>
-
-      <img src="./logo.png" className=" h-1/2" alt="" />
-
-      {/* background glow */}
-      <div className="absolute inset-0 bg-black  opacity-20 blur-[100px]" />
+    <div className="min-h-screen flex flex-col justify-start items-center text-center">
+      <img src="./logo.png" alt="logo" className="h-32" />
 
       {/* heading */}
       <h1 className="text-[2.5rem] phone:text-[3rem] tablet:text-[4rem] laptop:text-[5rem] font-extrabold text-primary drop-shadow-lg animate-fade-in-scale">
@@ -38,7 +23,7 @@ function App() {
         Something exciting is coming your way. Stay tuned!
       </p>
 
-      <div className="absolute bottom-8 text-sm text-darkGray animate-fade-in-scale">
+      <div className="fixed bottom-0 text-sm bg-black/50 w-full py-5 text-white animate-fade-in-scale">
         © {new Date().getFullYear()} — All Rights Reserved
       </div>
     </div>
