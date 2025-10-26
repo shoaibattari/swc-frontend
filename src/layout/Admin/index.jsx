@@ -7,6 +7,7 @@ import {
 import { useAuthContext } from "../../context/AuthContext";
 
 import { Link, Route, Routes } from "react-router-dom";
+import { AdminCampusScreen } from "../../views/admin";
 
 const AdminLayout = () => {
   const { logout } = useAuthContext();
@@ -20,6 +21,9 @@ const AdminLayout = () => {
         <nav className="space-y-2">
           <Link to="/admin" className="block hover:underline">
             Dashboard
+          </Link>
+          <Link to="/admin/campus" className="block hover:underline">
+            Campus
           </Link>
           <Link to="/admin/courses" className="block hover:underline">
             Courses
@@ -39,6 +43,7 @@ const AdminLayout = () => {
           <Route path="/*" element={<AdminDashboardScreen />} />
           <Route path="/courses" element={<AdminCoursesScreen />} />
           <Route path="/events" element={<AdminEventsScreen />} />
+          <Route path="/campus" element={<AdminCampusScreen />} />
         </Routes>
       </main>
     </div>

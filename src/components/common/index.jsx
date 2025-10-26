@@ -1,3 +1,9 @@
 export { default as Wrapper } from "./Wrapper";
 export { default as CustomInput } from "./CustomInput";
 export { default as CommonButton } from "./CommonButton";
+export { default as modal } from "./Modal";
+export { default as WarningModal } from "./WarningModal";
+export { default as DynamicTable } from "./DynamicTable";
+export { default as TableSkeleton } from "./TableSkeleton";
+export { default as DynamicViewTitle } from "./DynamicViewTitle";
+export { default as WhiteConatiner } from "./WhiteContainer";
