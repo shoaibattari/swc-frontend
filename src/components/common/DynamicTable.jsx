@@ -53,9 +53,9 @@ const DynamicTable = ({
           <TableSkeleton rows={rows} columns={columns.length} />
         ) : (
           <>
-            <table className="hidden laptop:table w-full border text-[#0D0D0D]">
-              <thead className="border">
-                <tr className="bg-[#FFDDBE]">
+            <table className="hidden laptop:table w-full border border-light-grey">
+              <thead className="border border-light-grey">
+                <tr className="bg-secondary text-white">
                   {columns?.map((col, index) => (
                     <th
                       key={index}
@@ -75,7 +75,7 @@ const DynamicTable = ({
                       {columns.map((col, colIndex) => (
                         <td
                           key={colIndex}
-                          className={`border-b text-[10px] tablet:text-xs desktop:text-sm _4k:text-base border-border-grey p-2 py-4  ${
+                          className={`border-b border-light-grey text-[10px] tablet:text-xs desktop:text-sm _4k:text-base border-border-grey p-2 py-4  ${
                             colIndex === 0 && " text-left"
                           }`}
                         >

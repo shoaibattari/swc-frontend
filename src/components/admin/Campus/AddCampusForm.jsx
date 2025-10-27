@@ -4,8 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import apis from "../../../config/api";
 import { CommonButton, CustomInput } from "../../common";
 import { toast } from "react-toastify";
+import { useAppContext } from "../../../context/AppContext";
 
-const AddCampusForm = ({ closeModal, fetchAllCampuses }) => {
+const AddCampusForm = ({ closeModal }) => {
+  const { fetchAllCampuses } = useAppContext();
+
   const { mutate: addCampus, isLoading: addingCampus } = useMutation({
     mutationFn: (formData) => apis.addCampus(formData),
     onSuccess: () => {

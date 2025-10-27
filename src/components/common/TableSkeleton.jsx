@@ -6,7 +6,7 @@ const TableSkeleton = ({ rows = 3, columns = 5 }) => {
       <table className="hidden laptop:table w-full border-collapse">
         <tbody>
           {[...Array(rows)].map((_, rowIndex) => (
-            <tr key={rowIndex} className="border-b">
+            <tr key={rowIndex} className="border-b border-light-grey">
               {[...Array(columns)].map((_, colIndex) => (
                 <td key={colIndex} className="p-3">
                   <div className="h-4 bg-gray-300 animate-pulse rounded w-full"></div>

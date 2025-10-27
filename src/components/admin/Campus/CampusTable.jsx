@@ -1,7 +1,10 @@
+import { useAppContext } from "../../../context/AppContext";
 import { DynamicTable } from "../../common";
 import WhiteContainer from "../../common/WhiteContainer";
 
-const CampusTable = ({ data, fetchingCampuses }) => {
+const CampusTable = () => {
+  const { campuses, fetchingCampuses } = useAppContext();
+
   // Table columns
   const columns = [
     {
@@ -23,7 +26,7 @@ const CampusTable = ({ data, fetchingCampuses }) => {
       <DynamicTable
         hideSearchBar={true}
         columns={columns}
-        data={data?.map((campus) => ({
+        data={campuses?.map((campus) => ({
           id: campus?._id,
           name: campus?.name || "--",
           address: campus?.address || "--",

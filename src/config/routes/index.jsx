@@ -3,6 +3,7 @@ import { useAuthContext } from "../../context/AuthContext";
 import UserLayout from "../../layout/User";
 import AuthLayout from "../../layout/Auth";
 import AdminLayout from "../../layout/Admin";
+import logo from "/logo.png";
 
 const Root = () => {
   const { isAuthenticated, role, splashLoading } = useAuthContext();
@@ -10,8 +11,11 @@ const Root = () => {
   return (
     <div>
       {splashLoading ? (
-        <div className="h-screen flex items-center justify-center text-white bg-black w-full">
-          Loading....
+        <div className="h-screen flex flex-col items-center justify-center text-white bg-black w-full">
+          <img src={logo} className="animate-pulse " alt="" />
+          <span className="text-secondary text-lg">
+            Social Welfare Committee Loading....
+          </span>
         </div>
       ) : (
         <Routes>
