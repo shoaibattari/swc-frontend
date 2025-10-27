@@ -1,11 +1,11 @@
 import { CommonButton } from "../../components";
 import DynamicViewTitle from "../../components/common/DynamicViewTitle";
 import Modal from "../../components/common/Modal";
-import AddCampusForm from "../../components/admin/Campus/AddCampusForm";
 import { useState } from "react";
-import CampusTable from "../../components/admin/Campus/CampusTable";
+import AddCourseForm from "../../components/admin/Course/AddCourseForm";
+import CoursesTable from "../../components/admin/Course/CoursesTable";
 
-const Campus = () => {
+const Course = () => {
   const [isOpen, open] = useState(false);
 
   const openModal = () => {
@@ -19,25 +19,25 @@ const Campus = () => {
   return (
     <div className="w-full">
       <DynamicViewTitle
-        title={"Campus Management"}
-        description={"View All Details Campus "}
+        title={"Course Management"}
+        description={"View All Details Courses "}
       >
         <div className="flex justify-end">
           <CommonButton onClick={() => openModal()} variant="primary" size="md">
-            Add Campus
+            Add Course
           </CommonButton>
         </div>
       </DynamicViewTitle>
 
-      <CampusTable />
+      <CoursesTable />
 
       {isOpen && (
         <Modal onClose={closeModal} heading="Add Campus">
-          <AddCampusForm closeModal={closeModal} />
+          <AddCourseForm closeModal={closeModal} />
         </Modal>
       )}
     </div>
   );
 };
 
-export default Campus;
+export default Course;
