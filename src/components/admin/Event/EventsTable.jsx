@@ -2,7 +2,7 @@ import { useAppContext } from "../../../context/AppContext";
 import { DynamicTable } from "../../common";
 import WhiteContainer from "../../common/WhiteContainer";
 
-const CoursesTable = () => {
+const EventsTable = () => {
   const { courses, fetchingCourses } = useAppContext();
 
   // ✅ Table columns
@@ -38,4 +38,4 @@ const CoursesTable = () => {
   );
 };
 
-export default CoursesTable;
+export default EventsTable;

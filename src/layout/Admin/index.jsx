@@ -2,7 +2,12 @@ import { CommonButton } from "../../components";
 import { useAuthContext } from "../../context/AuthContext";
 
 import { Link, Route, Routes } from "react-router-dom";
-import { AdminCampusScreen, AdminCourseScreen, AdminDashboardScreen } from "../../views/admin";
+import {
+  AdminCampusScreen,
+  AdminCourseScreen,
+  AdminDashboardScreen,
+  AdminEventScreen,
+} from "../../views/admin";
 
 const AdminLayout = () => {
   const { logout } = useAuthContext();
@@ -23,6 +28,9 @@ const AdminLayout = () => {
           <Link to="/admin/courses" className="block hover:underline">
             Courses
           </Link>
+          <Link to="/admin/events" className="block hover:underline">
+            Events
+          </Link>
         </nav>
         <div className="mt-6">
           <CommonButton onClick={logout}>Logout</CommonButton>
@@ -35,6 +43,7 @@ const AdminLayout = () => {
           <Route path="/*" element={<AdminDashboardScreen />} />
           <Route path="/courses" element={<AdminCourseScreen />} />
           <Route path="/campus" element={<AdminCampusScreen />} />
+          <Route path="/events" element={<AdminEventScreen />} />
         </Routes>
       </main>
     </div>
