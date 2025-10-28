@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import { LoginScreen } from "../../views/auth";
+import { CourseFormScreen, LoginScreen } from "../../views/auth";
 import { HeroSection } from "../../components";
 
 const AuthLayout = () => {
@@ -9,6 +9,7 @@ const AuthLayout = () => {
       <Routes>
         <Route path="/" element={<HeroSection />} />
         <Route path="/login" element={<LoginScreen />} />
+        <Route path="/course-form" element={<CourseFormScreen />} />
       </Routes>
     </div>
   );

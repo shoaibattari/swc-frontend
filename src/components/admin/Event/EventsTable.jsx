@@ -3,17 +3,19 @@ import { DynamicTable } from "../../common";
 import WhiteContainer from "../../common/WhiteContainer";
 
 const EventsTable = () => {
-  const { courses, fetchingCourses } = useAppContext();
+  const { events, fetchingEvents } = useAppContext();
 
   // ✅ Table columns
   const columns = [
-    { label: "Course Name", accessor: "name" },
+    { label: "Event Name", accessor: "name" },
+    { label: "Date", accessor: "date" },
     { label: "Duration", accessor: "duration" },
+    { label: "Venue", accessor: "venue" },
     { label: "Gender", accessor: "gender" },
-    { label: "Batch", accessor: "batch" },
-    { label: "Campus", accessor: "campusName" },
-    { label: "Categories", accessor: "category" },
+    { label: "Category", accessor: "category" },
     { label: "Status", accessor: "status" },
+    { label: "Fees", accessor: "fees" },
+    { label: "Campus", accessor: "campusName" },
   ];
 
   return (
@@ -21,18 +23,27 @@ const EventsTable = () => {
       <DynamicTable
         hideSearchBar={false}
         columns={columns}
-        data={courses?.map((course) => ({
-          id: course?._id,
-          name: course?.name || "--",
-          duration: course?.duration || "--",
-          gender: course?.gender || "--",
-          batch: course?.batch || "--",
+        data={events?.map((event) => ({
+          id: event?._id,
+          name: event?.name || "--",
+          date: event?.date || "--",
+          duration: event?.duration || "--",
+          venue: event?.venue || "--",
+          gender: event?.gender || "--",
+          category: Array.isArray(event?.category)
+            ? event.category.join(", ")
+            : event?.category || "--",
+          status: event?.status || "--",
+          fees:
+            event?.fees === 0
+              ? "Free"
+              : event?.fees
+              ? `Rs. ${event?.fees}`
+              : "--",
           campusName:
-            course?.courseCampus?.name || course?.courseCampusName || "--",
-          category: course?.category || "--",
-          status: course?.status || "--",
+            event?.eventCampus?.name || event?.eventCampusName || "--",
         }))}
-        loading={fetchingCourses}
+        loading={fetchingEvents}
       />
     </WhiteContainer>
   );

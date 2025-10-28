@@ -1,10 +1,9 @@
 import { CommonButton } from "../../components";
 import DynamicViewTitle from "../../components/common/DynamicViewTitle";
 import Modal from "../../components/common/Modal";
-import AddCampusForm from "../../components/admin/Campus/AddCampusForm";
 import { useState } from "react";
-import CampusTable from "../../components/admin/Campus/CampusTable";
 import AddEventForm from "../../components/admin/Event/AddEventForm";
+import EventsTable from "../../components/admin/Event/EventsTable";
 
 const Events = () => {
   const [isOpen, open] = useState(false);
@@ -30,7 +29,7 @@ const Events = () => {
         </div>
       </DynamicViewTitle>
 
-      <CampusTable />
+      <EventsTable />
 
       {isOpen && (
         <Modal width="700px" onClose={closeModal} heading="Add Event">

@@ -30,7 +30,9 @@ const AddCourseForm = ({ closeModal }) => {
     gender: "",
     batch: "",
     status: "",
+    section: "",
     courseCampus: "",
+    fees: "",
     category: [], // new
   };
 
@@ -38,6 +40,7 @@ const AddCourseForm = ({ closeModal }) => {
   const validationSchema = Yup.object({
     name: Yup.string().required("Course name is required"),
     duration: Yup.string().required("Duration is required"),
+    section: Yup.string().required("Section is required"),
     gender: Yup.string().oneOf(["Male", "Female", "Both"], "Select a gender"),
     status: Yup.string().oneOf(
       ["Coming Soon", "Admission Open", "Admission Closed"],
@@ -45,6 +48,7 @@ const AddCourseForm = ({ closeModal }) => {
     ),
     batch: Yup.string().required("Batch is required"),
     courseCampus: Yup.string().required("Campus is required"),
+    fees: Yup.number().required("fees is required"),
     category: Yup.array().of(Yup.string().trim()),
   });
 
@@ -104,136 +108,158 @@ const AddCourseForm = ({ closeModal }) => {
 
           return (
             <Form className="space-y-5">
-              {/* Name */}
-              <CustomInput
-                label="Course Name"
-                name="name"
-                type="text"
-                placeholder="Enter course name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.name && errors.name}
-              />
+              <div className="grid grid-cols-2 gap-x-4">
+                {/* Name */}
+                <CustomInput
+                  label="Course Name"
+                  name="name"
+                  type="text"
+                  placeholder="Enter course name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.name && errors.name}
+                />
 
-              {/* Duration */}
-              <CustomInput
-                label="Duration"
-                name="duration"
-                type="text"
-                placeholder="e.g. 6 Months / 1 Year"
-                value={values.duration}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.duration && errors.duration}
-              />
+                {/* Duration */}
+                <CustomInput
+                  label="Duration"
+                  name="duration"
+                  type="text"
+                  placeholder="e.g. 6 Months / 1 Year"
+                  value={values.duration}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.duration && errors.duration}
+                />
 
-              {/* Gender */}
-              <CustomInput
-                type="select"
-                label="Gender"
-                name="gender"
-                value={values.gender}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.gender && errors.gender}
-                options={[
-                  { value: "", label: "Select gender" },
-                  { value: "Male", label: "Male" },
-                  { value: "Female", label: "Female" },
-                  { value: "Both", label: "Both" },
-                ]}
-              />
+                <CustomInput
+                  label="Section"
+                  name="section"
+                  type="text"
+                  placeholder="Enter section time"
+                  value={values.section}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.section && errors.section}
+                />
+                {/* Gender */}
+                <CustomInput
+                  type="select"
+                  label="Gender"
+                  name="gender"
+                  value={values.gender}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.gender && errors.gender}
+                  options={[
+                    { value: "", label: "Select gender" },
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
+                    { value: "Both", label: "Both" },
+                  ]}
+                />
 
-              {/* Batch */}
-              <CustomInput
-                label="Batch"
-                name="batch"
-                type="text"
-                placeholder="Enter batch name or year"
-                value={values.batch}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.batch && errors.batch}
-              />
+                {/* Batch */}
+                <CustomInput
+                  label="Batch"
+                  name="batch"
+                  type="text"
+                  placeholder="Enter batch name or year"
+                  value={values.batch}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.batch && errors.batch}
+                />
 
-              {/* Campus */}
-              <CustomInput
-                type="select"
-                label="Campus"
-                name="courseCampus"
-                value={values.courseCampus}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.courseCampus && errors.courseCampus}
-                options={[
-                  { value: "", label: "Select campus" },
-                  ...campuses.map((campus) => ({
-                    value: campus._id,
-                    label: campus.name,
-                  })),
-                ]}
-              />
+                <CustomInput
+                  label="Fees"
+                  name="fees"
+                  type="number"
+                  placeholder="Enter course fees"
+                  value={values.fees}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.fees && errors.fees}
+                />
 
-              {/* Status */}
-              <CustomInput
-                type="select"
-                label="Status"
-                name="status"
-                value={values.status}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.status && errors.status}
-                options={[
-                  { value: "", label: "Select Status" },
-                  { value: "Coming Soon", label: "Coming Soon" },
-                  { value: "Admission Open", label: "Admission Open" },
-                  { value: "Admission Closed", label: "Admission Closed" },
-                ]}
-              />
+                {/* Campus */}
+                <CustomInput
+                  type="select"
+                  label="Campus"
+                  name="courseCampus"
+                  value={values.courseCampus}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.courseCampus && errors.courseCampus}
+                  options={[
+                    { value: "", label: "Select campus" },
+                    ...campuses.map((campus) => ({
+                      value: campus._id,
+                      label: campus.name,
+                    })),
+                  ]}
+                />
 
-              {/* Category: Tag input */}
-              <div>
-                <label className="block font-medium mb-2">
-                  Category (optional)
-                </label>
-                <div className="flex gap-2 items-center">
-                  <div className="flex-1 border rounded p-2 flex flex-wrap gap-2 items-center">
-                    {values.category.length > 0 &&
-                      values.category.map((cat, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-2 bg-gray-200 rounded px-2 py-1 text-sm"
-                        >
-                          <span>{cat}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeTag(idx)}
-                            className="text-xs leading-none"
-                            aria-label={`Remove ${cat}`}
+                {/* Status */}
+                <CustomInput
+                  type="select"
+                  label="Status"
+                  name="status"
+                  value={values.status}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.status && errors.status}
+                  options={[
+                    { value: "", label: "Select Status" },
+                    { value: "Coming Soon", label: "Coming Soon" },
+                    { value: "Admission Open", label: "Admission Open" },
+                    { value: "Admission Closed", label: "Admission Closed" },
+                  ]}
+                />
+
+                {/* Category: Tag input */}
+                <div>
+                  <label className="block font-medium mb-2">
+                    Category (optional)
+                  </label>
+                  <div className="flex gap-2 items-center">
+                    <div className="flex-1 border rounded p-2 flex flex-wrap gap-2 items-center">
+                      {values.category.length > 0 &&
+                        values.category.map((cat, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-2 bg-gray-200 rounded px-2 py-1 text-sm"
                           >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
+                            <span>{cat}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeTag(idx)}
+                              className="text-xs leading-none"
+                              aria-label={`Remove ${cat}`}
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
 
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={onKeyDown}
-                      placeholder="Type category and press Enter or click +"
-                      className="flex-1 min-w-40 outline-none p-1 text-sm"
-                    />
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={onKeyDown}
+                        placeholder="Type category and press Enter or click +"
+                        className="flex-1 min-w-40 outline-none p-1 text-sm"
+                      />
+                    </div>
                   </div>
+                  {touched.category && errors.category ? (
+                    <div className="text-red-500 text-sm mt-1">
+                      {errors.category}
+                    </div>
+                  ) : null}
                 </div>
-                {touched.category && errors.category ? (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.category}
-                  </div>
-                ) : null}
               </div>
-
               <CommonButton
                 disabled={addingCourse}
                 type="submit"

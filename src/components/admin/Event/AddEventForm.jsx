@@ -32,7 +32,6 @@ const AddEventForm = ({ closeModal }) => {
     description: "",
     status: "",
     gender: "",
-    eventCampus: "",
     category: [], // array of tags
   };
 
@@ -43,6 +42,7 @@ const AddEventForm = ({ closeModal }) => {
     duration: Yup.string().required("Duration is required"),
     venue: Yup.string().required("Venue is required"),
     description: Yup.string().required("Description is required"),
+    fees: Yup.number().required("fees is required"),
     status: Yup.string()
       .oneOf(
         ["Coming Soon", "Registartion Open", "Registration Closed"],
@@ -52,7 +52,6 @@ const AddEventForm = ({ closeModal }) => {
     gender: Yup.string()
       .oneOf(["Male", "Female", "Both"], "Select valid gender")
       .required("Gender is required"),
-    eventCampus: Yup.string().required("Campus is required"),
     category: Yup.array().of(Yup.string().trim()),
   });
 
@@ -168,22 +167,15 @@ const AddEventForm = ({ closeModal }) => {
                   error={touched.description && errors.description}
                 />
 
-                {/* Campus */}
                 <CustomInput
-                  type="select"
-                  label="Campus"
-                  name="eventCampus"
-                  value={values.eventCampus}
+                  label="Event Fees"
+                  name="fees"
+                  type="number"
+                  placeholder="Enter event fees"
+                  value={values.fees}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={touched.eventCampus && errors.eventCampus}
-                  options={[
-                    { value: "", label: "Select Campus" },
-                    ...campuses.map((campus) => ({
-                      value: campus._id,
-                      label: campus.name,
-                    })),
-                  ]}
+                  error={touched.name && errors.fees}
                 />
 
                 {/* Gender */}

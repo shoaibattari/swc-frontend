@@ -32,7 +32,7 @@ const Course = () => {
       <CoursesTable />
 
       {isOpen && (
-        <Modal onClose={closeModal} heading="Add Campus">
+        <Modal width="800px" onClose={closeModal} heading="Add Course">
           <AddCourseForm closeModal={closeModal} />
         </Modal>
       )}

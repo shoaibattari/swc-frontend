@@ -13,6 +13,7 @@ import apis from "../config/api";
 const initialAppState = {
   campuses: [],
   courses: [],
+  events: [],
   initialized: false,
 };
 
@@ -64,11 +65,32 @@ export const AppProvider = ({ children }) => {
     },
   });
 
+  const { mutate: fetchAllEvents, isPending: fetchingEvents } = useMutation({
+    mutationFn: () => apis.getEvents(),
+    onSuccess: ({ data }) => {
+      if (data?.status) {
+        setAppState((prev) => ({
+          ...prev,
+          events: data?.data || [],
+          initialized: true,
+        }));
+      } else {
+        toast.error("Failed to load courses");
+        setAppState((prev) => ({ ...prev, initialized: true }));
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Error fetching courses");
+      setAppState((prev) => ({ ...prev, initialized: true }));
+    },
+  });
+
   // ✅ Function to trigger initial data load
   const loadAppData = useCallback(() => {
     fetchAllCampuses();
     fetchAllCourses();
-  }, [fetchAllCampuses, fetchAllCourses]);
+    fetchAllEvents();
+  }, [fetchAllCampuses, fetchAllCourses, fetchAllEvents]);
 
   // ✅ Load app data on mount
   useEffect(() => {
@@ -86,6 +108,9 @@ export const AppProvider = ({ children }) => {
         courses: appState.courses,
         fetchingCourses,
         fetchAllCourses,
+        events: appState.events,
+        fetchingEvents,
+        fetchAllEvents,
       }}
     >
       {children}
