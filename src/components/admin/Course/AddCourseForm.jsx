@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import apis from "../../../config/api";
 import { toast } from "react-toastify";
 import { useAppContext } from "../../../context/AppContext";
-import { CommonButton, CustomInput } from "../../common";
+import { CommonButton, CustomInput, TagInput } from "../../common";
 
 const AddCourseForm = ({ closeModal }) => {
   const { campuses, fetchAllCourses } = useAppContext();
@@ -40,7 +40,7 @@ const AddCourseForm = ({ closeModal }) => {
   const validationSchema = Yup.object({
     name: Yup.string().required("Course name is required"),
     duration: Yup.string().required("Duration is required"),
-    section: Yup.string().required("Section is required"),
+    section: Yup.array().of(Yup.string().trim()),
     gender: Yup.string().oneOf(["Male", "Female", "Both"], "Select a gender"),
     status: Yup.string().oneOf(
       ["Coming Soon", "Admission Open", "Admission Closed"],
@@ -73,39 +73,6 @@ const AddCourseForm = ({ closeModal }) => {
           values,
           setFieldValue, // <-- important
         }) => {
-          // local state for the category input text
-          const [tagInput, setTagInput] = useState("");
-
-          const addTag = (raw) => {
-            const val = (raw || tagInput || "").trim();
-            if (!val) return;
-            // allow comma-separated multiple in the input (e.g. "a, b")
-            const parts = val
-              .split(",")
-              .map((p) => p.trim())
-              .filter(Boolean);
-
-            const newTags = [...values.category];
-            parts.forEach((p) => {
-              if (!newTags.includes(p)) newTags.push(p);
-            });
-
-            setFieldValue("category", newTags);
-            setTagInput("");
-          };
-
-          const onKeyDown = (e) => {
-            if (e.key === "Enter" || e.key === ",") {
-              e.preventDefault();
-              addTag();
-            }
-          };
-
-          const removeTag = (index) => {
-            const updated = values.category.filter((_, i) => i !== index);
-            setFieldValue("category", updated);
-          };
-
           return (
             <Form className="space-y-5">
               <div className="grid grid-cols-2 gap-x-4">
@@ -132,16 +99,13 @@ const AddCourseForm = ({ closeModal }) => {
                   onBlur={handleBlur}
                   error={touched.duration && errors.duration}
                 />
-
-                <CustomInput
+                <TagInput
                   label="Section"
                   name="section"
-                  type="text"
-                  placeholder="Enter section time"
-                  value={values.section}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={touched.section && errors.section}
+                  values={values}
+                  setFieldValue={setFieldValue}
+                  touched={touched}
+                  errors={errors}
                 />
                 {/* Gender */}
                 <CustomInput
@@ -219,46 +183,14 @@ const AddCourseForm = ({ closeModal }) => {
                 />
 
                 {/* Category: Tag input */}
-                <div>
-                  <label className="block font-medium mb-2">
-                    Category (optional)
-                  </label>
-                  <div className="flex gap-2 items-center">
-                    <div className="flex-1 border rounded p-2 flex flex-wrap gap-2 items-center">
-                      {values.category.length > 0 &&
-                        values.category.map((cat, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center gap-2 bg-gray-200 rounded px-2 py-1 text-sm"
-                          >
-                            <span>{cat}</span>
-                            <button
-                              type="button"
-                              onClick={() => removeTag(idx)}
-                              className="text-xs leading-none"
-                              aria-label={`Remove ${cat}`}
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={onKeyDown}
-                        placeholder="Type category and press Enter or click +"
-                        className="flex-1 min-w-40 outline-none p-1 text-sm"
-                      />
-                    </div>
-                  </div>
-                  {touched.category && errors.category ? (
-                    <div className="text-red-500 text-sm mt-1">
-                      {errors.category}
-                    </div>
-                  ) : null}
-                </div>
+                <TagInput
+                  label="Category (optional)"
+                  name="category"
+                  values={values}
+                  setFieldValue={setFieldValue}
+                  touched={touched}
+                  errors={errors}
+                />
               </div>
               <CommonButton
                 disabled={addingCourse}

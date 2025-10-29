@@ -1,4 +1,5 @@
-import CourseForm from "../../components/auth/CourseForm";
+import { CourseForm } from "../../components";
+
 const Course = () => {
   return <CourseForm />;
 };

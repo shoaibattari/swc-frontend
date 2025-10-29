@@ -7,3 +7,4 @@ export { default as DynamicTable } from "./DynamicTable";
 export { default as TableSkeleton } from "./TableSkeleton";
 export { default as DynamicViewTitle } from "./DynamicViewTitle";
 export { default as WhiteConatiner } from "./WhiteContainer";
+export { default as TagInput } from "./TagInput";

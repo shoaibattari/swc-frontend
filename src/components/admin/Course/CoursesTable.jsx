@@ -11,6 +11,7 @@ const CoursesTable = () => {
     { label: "Duration", accessor: "duration" },
     { label: "Gender", accessor: "gender" },
     { label: "Batch", accessor: "batch" },
+    { label: "Section", accessor: "section" },
     { label: "Campus", accessor: "campusName" },
     { label: "Fees", accessor: "fees" },
     { label: "Categories", accessor: "category" },
@@ -27,6 +28,7 @@ const CoursesTable = () => {
           name: course?.name || "--",
           duration: course?.duration || "--",
           gender: course?.gender || "--",
+          section: course?.section || "--",
           fees: course?.fees || "--",
           batch: course?.batch || "--",
           campusName:

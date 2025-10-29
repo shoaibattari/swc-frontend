@@ -6,16 +6,13 @@ import { toast } from "react-toastify";
 import apis from "../../config/api";
 import { useState } from "react";
 
-const CourseForm = () => {
-  const { campuses, courses } = useAppContext();
-  const [sections, setSections] = useState([]);
-  const [filteredCourses, setFilteredCourses] = useState([]);
+const EventForm = () => {
+  const { events } = useAppContext(); // ✅ now using events instead of courses/campuses
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   // ✅ Initial values
   const initialValues = {
-    campus: "",
-    course: "",
-    sectionTime: "",
+    event: "",
     fullName: "",
     fatherName: "",
     contact: "",
@@ -34,9 +31,7 @@ const CourseForm = () => {
 
   // ✅ Validation
   const validationSchema = Yup.object({
-    campus: Yup.string().required("Campus is required"),
-    course: Yup.string().required("Course is required"),
-    sectionTime: Yup.string().required("Section time is required"),
+    event: Yup.string().required("Event is required"),
     fullName: Yup.string().required("Full name is required"),
     fatherName: Yup.string().required("Father name is required"),
     contact: Yup.string().required("Contact is required"),
@@ -62,6 +57,7 @@ const CourseForm = () => {
       if (data?.status) {
         toast.success("Registration successful!");
         resetForm();
+        setSelectedEvent(null);
       } else {
         toast.error(data?.message || "Something went wrong");
       }
@@ -72,9 +68,9 @@ const CourseForm = () => {
 
   return (
     <Wrapper className="py-12">
-      <div className=" mx-auto rounded-lg p-8">
+      <div className="mx-auto rounded-lg p-8">
         <h2 className="text-5xl font-bold text-center mb-6 text-primary">
-          Course Registration
+          Event Registration
         </h2>
 
         <Formik
@@ -92,80 +88,26 @@ const CourseForm = () => {
           }) => (
             <Form>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                {/* --- CAMPUS --- */}
+                {/* --- EVENT --- */}
                 <CustomInput
-                  label="Select Campus"
+                  label="Select Event"
                   type="select"
-                  name="campus"
-                  value={values.campus}
+                  name="event"
+                  value={values.event}
                   onChange={(e) => {
-                    const selectedCampusId = e.target.value;
-                    setFieldValue("campus", selectedCampusId);
-                    setFieldValue("course", "");
-                    setFieldValue("sectionTime", "");
-                    setSections([]);
-
-                    // 🔹 Filter courses for selected campus
-                    const filtered = courses.filter(
-                      (course) => course.courseCampus?._id === selectedCampusId
-                    );
-                    setFilteredCourses(filtered);
+                    const selectedId = e.target.value;
+                    setFieldValue("event", selectedId);
+                    const ev = events.find((ev) => ev._id === selectedId);
+                    setSelectedEvent(ev || null);
                   }}
                   onBlur={handleBlur}
-                  options={campuses.map((c) => ({
-                    value: c._id,
-                    label: c.name,
+                  options={events.map((e) => ({
+                    value: e._id,
+                    label: e.title || e.name, // ✅ support either field
                   }))}
-                  error={touched.campus && errors.campus}
+                  error={touched.event && errors.event}
                 />
 
-                {/* --- COURSE --- */}
-                <CustomInput
-                  label="Select Course"
-                  type="select"
-                  name="course"
-                  readOnly={filteredCourses.length === 0}
-                  value={values.course}
-                  onChange={(e) => {
-                    const selectedCourseId = e.target.value;
-                    setFieldValue("course", selectedCourseId);
-                    setFieldValue("sectionTime", "");
-
-                    // 🔹 Find course and set sections
-                    const selectedCourse = filteredCourses.find(
-                      (course) => course._id === selectedCourseId
-                    );
-                    if (selectedCourse?.section) {
-                      setSections(selectedCourse.section);
-                    } else {
-                      setSections([]);
-                    }
-                  }}
-                  onBlur={handleBlur}
-                  options={filteredCourses.map((c) => ({
-                    value: c._id,
-                    label: c.name,
-                  }))}
-                  error={touched.course && errors.course}
-                  disabled={!values.campus}
-                />
-
-                {/* --- SECTION TIME --- */}
-                <CustomInput
-                  label="Select Section"
-                  type="select"
-                  name="sectionTime"
-                  readOnly={sections.length === 0}
-                  value={values.sectionTime}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  options={sections.map((s) => ({
-                    value: s,
-                    label: s,
-                  }))}
-                  error={touched.sectionTime && errors.sectionTime}
-                  disabled={!values.course}
-                />
                 {/* --- PERSONAL INFO --- */}
                 <CustomInput
                   label="Full Name"
@@ -244,6 +186,7 @@ const CourseForm = () => {
 
                 <CustomInput
                   label="Gender"
+                  type="select"
                   name="gender"
                   value={values.gender}
                   onChange={handleChange}
@@ -301,7 +244,8 @@ const CourseForm = () => {
                   error={touched.city && errors.city}
                 />
               </div>
-              <div className="flex justify-end">
+
+              <div className="flex justify-end mt-8">
                 <CommonButton type="submit" variant="primary">
                   Submit Registration
                 </CommonButton>
@@ -314,4 +258,4 @@ const CourseForm = () => {
   );
 };
 
-export default CourseForm;
+export default EventForm;

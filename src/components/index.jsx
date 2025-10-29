@@ -9,4 +9,4 @@ export {
   modal,
 } from "./common/index";
 
-export { HeroSection, Login } from "./auth/index";
+export { HeroSection, Login, CourseForm, EventForm } from "./auth/index";
