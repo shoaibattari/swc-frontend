@@ -4,13 +4,30 @@ import { CustomInput, Wrapper, CommonButton } from "../index";
 import { useAppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
 import apis from "../../config/api";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const CourseForm = () => {
-  const { campuses, courses } = useAppContext();
+  const { courses } = useAppContext();
   const [sections, setSections] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
 
+  const campuses = useMemo(() => {
+    const openCourses = courses.filter(
+      (course) => course?.status === "Admission Open"
+    );
+    const uniqueCampuses = [];
+    const campusMap = new Map();
+
+    openCourses.forEach((course) => {
+      const campus = course.courseCampus;
+      if (campus && !campusMap.has(campus._id)) {
+        campusMap.set(campus._id, campus);
+        uniqueCampuses.push(campus);
+      }
+    });
+
+    return uniqueCampuses;
+  }, [courses]);
   // ✅ Initial values
   const initialValues = {
     campus: "",
@@ -57,6 +74,7 @@ const CourseForm = () => {
 
   // ✅ Submit Handler
   const handleSubmit = async (values, { resetForm }) => {
+    console.log("values", values);
     try {
       const { data } = await apis.registerParticipant(values);
       if (data?.status) {
@@ -99,15 +117,17 @@ const CourseForm = () => {
                   name="campus"
                   value={values.campus}
                   onChange={(e) => {
-                    const selectedCampusId = e.target.value;
-                    setFieldValue("campus", selectedCampusId);
+                    const campusId = e.target.value;
+                    setFieldValue("campus", campusId);
                     setFieldValue("course", "");
                     setFieldValue("sectionTime", "");
                     setSections([]);
 
-                    // 🔹 Filter courses for selected campus
+                    // 🔹 Filter courses with Admission Open for selected campus
                     const filtered = courses.filter(
-                      (course) => course.courseCampus?._id === selectedCampusId
+                      (c) =>
+                        c.courseCampus?._id === campusId &&
+                        c.status === "Admission Open"
                     );
                     setFilteredCourses(filtered);
                   }}
@@ -124,22 +144,18 @@ const CourseForm = () => {
                   label="Select Course"
                   type="select"
                   name="course"
-                  readOnly={filteredCourses.length === 0}
+                  disabled={!values.campus}
                   value={values.course}
                   onChange={(e) => {
-                    const selectedCourseId = e.target.value;
-                    setFieldValue("course", selectedCourseId);
+                    const courseId = e.target.value;
+                    setFieldValue("course", courseId);
                     setFieldValue("sectionTime", "");
 
-                    // 🔹 Find course and set sections
+                    // 🔹 Set sections for selected course
                     const selectedCourse = filteredCourses.find(
-                      (course) => course._id === selectedCourseId
+                      (course) => course._id === courseId
                     );
-                    if (selectedCourse?.section) {
-                      setSections(selectedCourse.section);
-                    } else {
-                      setSections([]);
-                    }
+                    setSections(selectedCourse?.section || []);
                   }}
                   onBlur={handleBlur}
                   options={filteredCourses.map((c) => ({
@@ -147,7 +163,6 @@ const CourseForm = () => {
                     label: c.name,
                   }))}
                   error={touched.course && errors.course}
-                  disabled={!values.campus}
                 />
 
                 {/* --- SECTION TIME --- */}
@@ -155,7 +170,7 @@ const CourseForm = () => {
                   label="Select Section"
                   type="select"
                   name="sectionTime"
-                  readOnly={sections.length === 0}
+                  disabled={!values.course}
                   value={values.sectionTime}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -164,7 +179,6 @@ const CourseForm = () => {
                     label: s,
                   }))}
                   error={touched.sectionTime && errors.sectionTime}
-                  disabled={!values.course}
                 />
                 {/* --- PERSONAL INFO --- */}
                 <CustomInput

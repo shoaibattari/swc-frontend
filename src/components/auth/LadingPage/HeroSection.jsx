@@ -1,7 +1,11 @@
 // src/components/landing/HeroSection.jsx
-import { Wrapper } from "../../common";
+import { useNavigate } from "react-router-dom";
+import { CommonButton, Wrapper } from "../../common";
+import { IoAddCircle } from "react-icons/io5";
+import { CiSearch } from "react-icons/ci";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <Wrapper>
       <div className="min-h-screen flex flex-col justify-start items-center text-center">
@@ -24,6 +28,24 @@ const HeroSection = () => {
         <p className="text-mediumGray  text-base tablet:text-lg laptop:text-xl max-w-lg animate-fade-slide">
           Something exciting is coming your way. Stay tuned!
         </p>
+        <div className="flex flex-col tablet:flex-row justify-center items-center gap-2 pt-4">
+          <CommonButton
+            onClick={() => navigate("/course-form")}
+            rightIcon
+            variant="primary"
+            size="md"
+          >
+            Course Admission Form
+          </CommonButton>
+          <CommonButton
+            onClick={() => navigate("/event-form")}
+            rightIcon
+            variant="secondary"
+            size="md"
+          >
+            Event Registration Form
+          </CommonButton>
+        </div>
 
         <div className="fixed bottom-0 text-sm bg-black/50 w-full py-5 text-white animate-fade-in-scale">
           © {new Date().getFullYear()} — All Rights Reserved

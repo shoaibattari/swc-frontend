@@ -1,8 +1,10 @@
 import React from "react";
+import { FaArrowRight } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 
 const variants = {
   primary: "bg-primary text-white hover:bg-primary/50",
-  secondary: "bg-secondary text-white hover:bg-secondary/50",
+  secondary: "bg-green-500 text-white hover:opacity-50",
   success: "bg-green/50 text-white hover:bg-green/10",
   danger: "bg-red/50 text-white hover:bg-red/10",
   warning: "bg-yellow/50 text-white hover:bg-yellow/10",
@@ -34,6 +36,10 @@ const CommonButton = ({
   const widthClass = fullWidth ? "w-full" : "";
   const disabledClass = disabled ? "opacity-60 cursor-not-allowed" : "";
 
+  // 🧠 Dynamic icon selection logic
+  const LeftIcon = leftIcon === true ? FaArrowLeft : leftIcon;
+  const RightIcon = rightIcon === true ? FaArrowRight : rightIcon;
+
   return (
     <button
       type={type}
@@ -41,9 +47,17 @@ const CommonButton = ({
       disabled={disabled}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${disabledClass} ${className}`}
     >
-      {leftIcon && <span className="mr-2">{FaArrowRight}</span>}
+      {leftIcon && (
+        <span className="mr-1">
+          <LeftIcon /> {/* ✅ Proper way to render dynamic icon */}
+        </span>
+      )}
       {children}
-      {rightIcon && <span className="ml-2">{rightIcon}</span>}
+      {rightIcon && (
+        <span className="ml-1">
+          <RightIcon />
+        </span>
+      )}
     </button>
   );
 };
