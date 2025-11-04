@@ -7,6 +7,7 @@ import {
   AdminCourseScreen,
   AdminDashboardScreen,
   AdminEventScreen,
+  AdminParticipantsScreen,
 } from "../../views/admin";
 
 const AdminLayout = () => {
@@ -31,6 +32,9 @@ const AdminLayout = () => {
           <Link to="/admin/events" className="block hover:underline">
             Events
           </Link>
+          <Link to="/admin/participants" className="block hover:underline">
+            Participants
+          </Link>
         </nav>
         <div className="mt-6">
           <CommonButton onClick={logout}>Logout</CommonButton>
@@ -44,6 +48,7 @@ const AdminLayout = () => {
           <Route path="/courses" element={<AdminCourseScreen />} />
           <Route path="/campus" element={<AdminCampusScreen />} />
           <Route path="/events" element={<AdminEventScreen />} />
+          <Route path="/participants" element={<AdminParticipantsScreen />} />
         </Routes>
       </main>
     </div>

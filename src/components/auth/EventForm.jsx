@@ -5,14 +5,17 @@ import { useAppContext } from "../../context/AppContext";
 import { toast } from "react-toastify";
 import apis from "../../config/api";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 const EventForm = () => {
-  const { events } = useAppContext(); // ✅ now using events instead of courses/campuses
+  const { events, fetchAllParticipants } = useAppContext(); // ✅ include fetchAllParticipants
+  console.log("🚀 ~ EventForm ~ events:", events);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   // ✅ Initial values
   const initialValues = {
     event: "",
+    category: "",
     fullName: "",
     fatherName: "",
     contact: "",
@@ -29,9 +32,17 @@ const EventForm = () => {
     city: "",
   };
 
-  // ✅ Validation
+  // ✅ Validation schema
   const validationSchema = Yup.object({
     event: Yup.string().required("Event is required"),
+    category: Yup.string().when("event", {
+      is: (val) => {
+        const ev = events.find((e) => e._id === val);
+        return ev?.category?.length > 0; // required only if event has category
+      },
+      then: (schema) => schema.required("Category is required"),
+      otherwise: (schema) => schema.notRequired(),
+    }),
     fullName: Yup.string().required("Full name is required"),
     fatherName: Yup.string().required("Father name is required"),
     contact: Yup.string().required("Contact is required"),
@@ -50,19 +61,32 @@ const EventForm = () => {
     city: Yup.string().required("City is required"),
   });
 
-  // ✅ Submit Handler
+  // ✅ Mutation setup
+  const { mutate: registerParticipant, isLoading: registeringParticipant } =
+    useMutation({
+      mutationFn: (formData) => apis.registerParticipant(formData),
+      onSuccess: () => {
+        fetchAllParticipants?.(); // optional refresh
+        toast.success("Registration successful!");
+      },
+      onError: (error) => {
+        toast.error(error?.message || "Error submitting form");
+      },
+    });
+
+  // ✅ Submit handler
   const handleSubmit = async (values, { resetForm }) => {
     try {
-      const { data } = await apis.registerParticipant(values);
-      if (data?.status) {
-        toast.success("Registration successful!");
-        resetForm();
-        setSelectedEvent(null);
-      } else {
-        toast.error(data?.message || "Something went wrong");
-      }
+      const payload = {
+        ...values,
+        eventId: values.event,
+        categoryId: values.category || null,
+      };
+      registerParticipant(payload);
+      resetForm();
+      setSelectedEvent(null);
     } catch (error) {
-      toast.error(error?.message || "Error submitting form");
+      toast.error("Submission failed");
     }
   };
 
@@ -99,14 +123,32 @@ const EventForm = () => {
                     setFieldValue("event", selectedId);
                     const ev = events.find((ev) => ev._id === selectedId);
                     setSelectedEvent(ev || null);
+                    setFieldValue("category", ""); // reset category
                   }}
                   onBlur={handleBlur}
                   options={events.map((e) => ({
                     value: e._id,
-                    label: e.title || e.name, // ✅ support either field
+                    label: e.title || e.name,
                   }))}
                   error={touched.event && errors.event}
                 />
+
+                {/* --- CATEGORY (only if selected event has category) --- */}
+                {selectedEvent?.category?.length > 0 && (
+                  <CustomInput
+                    label="Select Category"
+                    type="select"
+                    name="category"
+                    value={values.category}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    options={selectedEvent.category.map((cat) => ({
+                      value: cat,
+                      label: cat,
+                    }))}
+                    error={touched.category && errors.category}
+                  />
+                )}
 
                 {/* --- PERSONAL INFO --- */}
                 <CustomInput
@@ -246,8 +288,14 @@ const EventForm = () => {
               </div>
 
               <div className="flex justify-end mt-8">
-                <CommonButton type="submit" variant="primary">
-                  Submit Registration
+                <CommonButton
+                  type="submit"
+                  disabled={registeringParticipant}
+                  variant="primary"
+                >
+                  {registeringParticipant
+                    ? "Submitting..."
+                    : "Submit Registration"}
                 </CommonButton>
               </div>
             </Form>

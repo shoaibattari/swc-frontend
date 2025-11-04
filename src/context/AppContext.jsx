@@ -14,6 +14,7 @@ const initialAppState = {
   campuses: [],
   courses: [],
   events: [],
+  participants: [],
   initialized: false,
 };
 
@@ -85,12 +86,35 @@ export const AppProvider = ({ children }) => {
     },
   });
 
+  const { mutate: fetchAllParticipants, isPending: fetchingParticipants } =
+    useMutation({
+      mutationFn: () => apis.getParticipants(),
+      onSuccess: ({ data }) => {
+        if (data?.status) {
+          setAppState((prev) => ({
+            ...prev,
+            participants: data?.data || [],
+            initialized: true,
+          }));
+        } else {
+          toast.error("Failed to load courses");
+          setAppState((prev) => ({ ...prev, initialized: true }));
+        }
+      },
+      onError: (error) => {
+        toast.error(error?.message || "Error fetching courses");
+        setAppState((prev) => ({ ...prev, initialized: true }));
+      },
+    });
+
   // ✅ Function to trigger initial data load
   const loadAppData = useCallback(() => {
     fetchAllCampuses();
     fetchAllCourses();
     fetchAllEvents();
-  }, [fetchAllCampuses, fetchAllCourses, fetchAllEvents]);
+    fetchAllEvents();
+    fetchAllParticipants();
+  }, [fetchAllCampuses, fetchAllCourses, fetchAllEvents, fetchAllParticipants]);
 
   // ✅ Load app data on mount
   useEffect(() => {
@@ -111,6 +135,9 @@ export const AppProvider = ({ children }) => {
         events: appState.events,
         fetchingEvents,
         fetchAllEvents,
+        participants: appState.participants,
+        fetchingParticipants,
+        fetchAllParticipants,
       }}
     >
       {children}

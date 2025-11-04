@@ -5,6 +5,7 @@ const adminApi = (api) => ({
   getCourses: () => api.get("/course/all-course"),
   addEvent: (eventData) => api.post("/event/add", eventData),
   getEvents: () => api.get("/event/all-event"),
+  getParticipants: () => api.get("/participant/all-participant"),
 });
 
 export default adminApi;
