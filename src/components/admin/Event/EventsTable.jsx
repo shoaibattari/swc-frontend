@@ -3,8 +3,21 @@ import { DynamicTable } from "../../common";
 import WhiteContainer from "../../common/WhiteContainer";
 
 const EventsTable = () => {
-  const { events, campuses, fetchingEvents } = useAppContext();
-  console.log(events, "events");
+  const { events, fetchingEvents } = useAppContext();
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Registration Closed":
+        return "bg-red-500 text-red-50";
+      case "Registration Open":
+        return "bg-green-500 text-green-50";
+      case "Coming Soon":
+        return "bg-orange-500 text-orange-50";
+
+      default:
+        return "bg-gray-200 text-gray-400";
+    }
+  };
   // ✅ Table columns
   const columns = [
     { label: "Event Name", accessor: "name" },
@@ -13,37 +26,52 @@ const EventsTable = () => {
     { label: "Duration", accessor: "duration" },
     { label: "Venue", accessor: "venue" },
     { label: "Gender", accessor: "gender" },
-    { label: "Category", accessor: "category" },
-    { label: "Status", accessor: "status" },
+    {
+      label: "Category",
+      accessor: "category",
+      renderCell: (row) => {
+        return (
+          <div className="flex flex-col items-center gap-0.5">
+            {row?.category?.map((cat, index) => (
+              <span
+                key={index}
+                className={`px-2 py-1 rounded text-center text-nowrap `}
+              >
+                {cat || "-"}
+              </span>
+            ))}
+          </div>
+        );
+      },
+    },
+
+    {
+      label: "Status",
+      accessor: "status",
+      renderCell: (row) => {
+        console.log("🚀 ~ EventsTable ~ row:", row.status);
+        return (
+          <div className="flex flex-col items-start gap-2">
+            <span
+              className={`px-2 py-1 rounded text-nowrap ${getStatusColor(
+                row.status
+              )}`}
+            >
+              {row.status}
+            </span>
+          </div>
+        );
+      },
+    },
     { label: "Fees", accessor: "fees" },
   ];
 
-  const data = events?.map((event) => {
-    const campus = campuses.find((c) => c._id === event?.eventCampus);
-    console.log(campus, "campus");
-
-    return {
-      id: event?._id,
-      name: event?.name || "--",
-      date: event?.date || "--",
-      description: event?.description || "--",
-      duration: event?.duration || "--",
-      venue: event?.venue || "--",
-      gender: event?.gender || "--",
-      category: Array.isArray(event?.category)
-        ? event.category.join(", ")
-        : event?.category || "--",
-      status: event?.status || "--",
-      fees:
-        event?.fees === 0 ? "Free" : event?.fees ? `Rs. ${event?.fees}` : "--",
-    };
-  });
   return (
     <WhiteContainer>
       <DynamicTable
         hideSearchBar={false}
         columns={columns}
-        data={data}
+        data={events}
         loading={fetchingEvents}
       />
     </WhiteContainer>
