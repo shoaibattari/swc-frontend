@@ -24,9 +24,9 @@ const Root = () => {
             path="/*"
             element={
               isAuthenticated && role === "user" ? (
-                <Navigate to="/user" replace />
+                <Navigate to="/user/participants" replace />
               ) : isAuthenticated && role === "admin" ? (
-                <Navigate to="/admin" replace />
+                <Navigate to="/admin/participants" replace />
               ) : (
                 <AuthLayout />
               )

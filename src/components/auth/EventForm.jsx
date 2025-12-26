@@ -330,7 +330,7 @@ const EventForm = () => {
           heading={"Registration Successful!"}
           onClose={() => setIsModalOpen(false)}
         >
-          <div className="space-y-3 grid grid-cols-2 gap-4">
+          <div className="space-y-3 grid-cols-1 laptop-sm:grid grid-cols-2 gap-4">
             {Object.entries(modalData).map(([key, value]) => (
               <div key={key} className="flex justify-between border-b pb-1">
                 <span className="font-medium text-gray-700">{key}</span>

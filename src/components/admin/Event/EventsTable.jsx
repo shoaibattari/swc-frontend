@@ -21,7 +21,17 @@ const EventsTable = () => {
   // ✅ Table columns
   const columns = [
     { label: "Event Name", accessor: "name" },
-    { label: "Event Description", accessor: "description" },
+    {
+      label: "Event Description",
+      accessor: "description",
+      renderCell: (row) => {
+        return (
+          <p className={`px-2 py-1 max-w-48 rounded laptop-sm:text-center `}>
+            {row?.description || "-"}
+          </p>
+        );
+      },
+    },
     { label: "Date", accessor: "date" },
     { label: "Duration", accessor: "duration" },
     { label: "Venue", accessor: "venue" },
@@ -31,7 +41,7 @@ const EventsTable = () => {
       accessor: "category",
       renderCell: (row) => {
         return (
-          <div className="flex flex-col items-center gap-0.5">
+          <div className="flex flex-col items-start laptop-sm:items-center gap-0.5">
             {row?.category?.map((cat, index) => (
               <span
                 key={index}
@@ -49,7 +59,6 @@ const EventsTable = () => {
       label: "Status",
       accessor: "status",
       renderCell: (row) => {
-     
         return (
           <div className="flex flex-col items-start gap-2">
             <span
