@@ -30,6 +30,9 @@ const UserLayout = () => {
 
       {/* Main Content */}
       <main className="flex-1 p-6 bg-gray-100">
+        <div className="flex justify-end laptop-sm:hidden">
+          <CommonButton onClick={logout}>Logout</CommonButton>
+        </div>
         <Routes>
           <Route path="/*" element={<UserDashboardScreen />} />
           <Route path="/participants" element={<UserParticipantsScreen />} />
