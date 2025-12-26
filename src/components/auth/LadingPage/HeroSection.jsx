@@ -45,6 +45,14 @@ const HeroSection = () => {
           >
             Event Registration Form
           </CommonButton>
+          <CommonButton
+            onClick={() => navigate("/login")}
+            rightIcon
+            variant="primary"
+            size="md"
+          >
+            Admin
+          </CommonButton>
         </div>
 
         <div className="fixed bottom-0 text-sm bg-black/50 w-full py-5 text-white animate-fade-in-scale">
