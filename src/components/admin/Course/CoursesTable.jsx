@@ -5,7 +5,7 @@ import WhiteContainer from "../../common/WhiteContainer";
 const CoursesTable = () => {
   const { courses, fetchingCourses } = useAppContext();
   const getStatusColor = (status) => {
-    console.log("🚀 ~ getStatusColor ~ status:", status);
+ 
     switch (status) {
       case "Admission Closed":
         return "bg-red-500 text-red-50";

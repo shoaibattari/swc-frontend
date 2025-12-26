@@ -6,12 +6,15 @@ import { toast } from "react-toastify";
 import apis from "../../config/api";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import Modal from "../common/Modal";
 
 const EventForm = () => {
   const { events, fetchAllParticipants } = useAppContext(); // ✅ include fetchAllParticipants
-  console.log("🚀 ~ EventForm ~ events:", events);
-  const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [modalData, setModalData] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  console.log(modalData, "modal data");
   // ✅ Initial values
   const initialValues = {
     event: "",
@@ -62,17 +65,21 @@ const EventForm = () => {
   });
 
   // ✅ Mutation setup
-  const { mutate: registerParticipant, isLoading: registeringParticipant } =
-    useMutation({
-      mutationFn: (formData) => apis.registerParticipant(formData),
-      onSuccess: () => {
-        fetchAllParticipants?.(); // optional refresh
-        toast.success("Registration successful!");
-      },
-      onError: (error) => {
-        toast.error(error?.message || "Error submitting form");
-      },
-    });
+  const {
+    mutate: registerParticipant,
+    isLoading: registeringParticipant,
+  } = useMutation({
+    mutationFn: (formData) => apis.registerParticipant(formData),
+    onSuccess: (data) => {
+      fetchAllParticipants?.(); // optional refresh
+      setModalData(handleModalData(data?.data?.data)); // store API response
+      setIsModalOpen(true);
+      toast.success("Registration successful!");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Error submitting form");
+    },
+  });
 
   // ✅ Submit handler
   const handleSubmit = async (values, { resetForm }) => {
@@ -88,6 +95,20 @@ const EventForm = () => {
     } catch (error) {
       toast.error("Submission failed");
     }
+  };
+
+  const handleModalData = (data) => {
+    // Map only required fields
+    return {
+      "Participant ID": data.participantId,
+      "Full Name": data.fullName,
+      "Event ID": data.event, // or map to event name if you have it
+      Category: data.category || "N/A",
+      Contact: data.contact,
+      Email: data.email,
+      Gender: data.gender,
+      "Date of Birth": data.dob,
+    };
   };
 
   return (
@@ -302,6 +323,32 @@ const EventForm = () => {
           )}
         </Formik>
       </div>
+
+      {isModalOpen && (
+        <Modal
+          width="800px"
+          heading={"Registration Successful!"}
+          onClose={() => setIsModalOpen(false)}
+        >
+          <div className="space-y-3 grid grid-cols-2 gap-4">
+            {Object.entries(modalData).map(([key, value]) => (
+              <div key={key} className="flex justify-between border-b pb-1">
+                <span className="font-medium text-gray-700">{key}</span>
+                <span className="text-gray-900">{value}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark transition"
+            >
+              Close
+            </button>
+          </div>
+        </Modal>
+      )}
     </Wrapper>
   );
 };

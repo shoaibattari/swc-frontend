@@ -49,7 +49,7 @@ const EventsTable = () => {
       label: "Status",
       accessor: "status",
       renderCell: (row) => {
-        console.log("🚀 ~ EventsTable ~ row:", row.status);
+     
         return (
           <div className="flex flex-col items-start gap-2">
             <span

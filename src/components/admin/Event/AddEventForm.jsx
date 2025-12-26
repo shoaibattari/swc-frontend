@@ -45,7 +45,7 @@ const AddEventForm = ({ closeModal }) => {
     fees: Yup.number().required("fees is required"),
     status: Yup.string()
       .oneOf(
-        ["Coming Soon", "Registartion Open", "Registration Closed"],
+        ["Coming Soon", "Registration Open", "Registration Closed"],
         "Select valid status"
       )
       .required("Status is required"),
@@ -207,7 +207,7 @@ const AddEventForm = ({ closeModal }) => {
                   options={[
                     { value: "", label: "Select Status" },
                     { value: "Coming Soon", label: "Coming Soon" },
-                    { value: "Registartion Open", label: "Registartion Open" },
+                    { value: "Registration Open", label: "Registration Open" },
                     {
                       value: "Registration Closed",
                       label: "Registration Closed",

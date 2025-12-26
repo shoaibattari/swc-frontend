@@ -2,14 +2,17 @@ import { useMutation } from "@tanstack/react-query";
 import { useAppContext } from "../../../context/AppContext";
 import { DynamicTable } from "../../common";
 import WhiteContainer from "../../common/WhiteContainer";
+import apis from "../../../config/api";
+import { toast } from "react-toastify";
 
 const ParticipantsTable = () => {
-  const { participants, fetchAllParticipants, fetchingParticipants } =
-    useAppContext();
+  const {
+    participants,
+    fetchAllParticipants,
+    fetchingParticipants,
+  } = useAppContext();
 
-  console.log("🚀 ~ ParticipantsTable ~ participants:", participants);
   const getStatusColor = (status) => {
-    console.log("🚀 ~ getStatusColor ~ status:", status);
     switch (status) {
       case "Un-paid":
         return "bg-red-500 text-red-50";
@@ -21,8 +24,23 @@ const ParticipantsTable = () => {
     }
   };
 
+  const { mutate: markAttendance, isPending: updatingAttendance } = useMutation(
+    {
+      mutationFn: ({ participantId, isAttend }) =>
+        apis.markParticipantAttendance(participantId, { isAttend }),
+      onSuccess: () => {
+        toast.success("Attendance updated successfully!");
+        fetchAllParticipants?.(); // refresh participants after update
+      },
+      onError: (error) => {
+        toast.error(error?.message || "Failed to update attendance");
+      },
+    }
+  );
+
   const { mutate: markPaid, isPending: markingPaid } = useMutation({
-    mutationFn: (participantId) => apis.markParticipantPaid(participantId),
+    mutationFn: ({ participantId, isPaid }) =>
+      apis.markParticipantPaid(participantId, { isPaid }),
     onSuccess: () => {
       toast.success("Participant marked as Paid!");
       fetchAllParticipants?.(); // refresh participants after update
@@ -51,24 +69,39 @@ const ParticipantsTable = () => {
       accessor: "status",
       renderCell: (row) => (
         <div className="flex flex-col items-start gap-2">
-          <span
-            className={`px-2 py-1 rounded text-nowrap ${getStatusColor(
+          <button
+            onClick={() =>
+              markPaid({ participantId: row.id, isPaid: row.status !== "Paid" })
+            }
+            disabled={markingPaid}
+            className={`px-2 py-1 text-nowrap text-sm rounded ${getStatusColor(
               row.status
-            )}`}
+            )} transition `}
           >
-            {row.status}
-          </span>
-
-          {row.status === "Un-paid" && (
-            <button
-              onClick={() => markPaid(row.id)}
-              disabled={markingPaid}
-              className="px-2 py-1 text-nowrap text-sm rounded bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50"
-            >
-              {markingPaid ? "Updating..." : "Mark as Paid"}
-            </button>
-          )}
+            {row.status === "Paid"
+              ? "Paid"
+              : markingPaid
+              ? "Updating..."
+              : "Mark as Paid"}
+          </button>
         </div>
+      ),
+    },
+    {
+      label: "Attendance",
+      accessor: "isAttend",
+      renderCell: (row) => (
+        <button
+          onClick={() =>
+            markAttendance({ participantId: row.id, isAttend: !row.isAttend })
+          }
+          disabled={updatingAttendance}
+          className={`px-2 py-1 text-sm rounded ${
+            row.isAttend ? "bg-green-500 text-white" : "bg-red-500 text-white"
+          }`}
+        >
+          {row.isAttend ? "Present" : "Absent"}
+        </button>
       ),
     },
   ];
@@ -94,6 +127,7 @@ const ParticipantsTable = () => {
         : "--",
       venue: p.event?.venue || "--",
       status: p.isPaid ? "Paid" : "Un-paid",
+      isAttend: p.isAttend || false,
     };
   });
 

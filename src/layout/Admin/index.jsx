@@ -16,7 +16,7 @@ const AdminLayout = () => {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-4">
+      <aside className="w-64 hidden laptop-sm:block bg-gray-800 text-white p-4">
         <h2 className="text-lg font-bold mb-4">Dashbaord</h2>
 
         <nav className="space-y-2">
