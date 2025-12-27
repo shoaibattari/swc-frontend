@@ -9,7 +9,7 @@ const Root = () => {
   const { isAuthenticated, role, splashLoading } = useAuthContext();
 
   return (
-    <div>
+    <div className="relative pb-40 laptop-sm:pb-24 min-h-screen">
       {splashLoading ? (
         <div className="h-screen flex flex-col items-center justify-center text-white bg-black w-full">
           <img src={logo} className="animate-pulse " alt="" />
@@ -63,6 +63,25 @@ const Root = () => {
           />
         </Routes>
       )}
+
+      <footer className="absolute bottom-0 border-t py-6 text-center text-sm bg-black text-gray-50 w-full">
+        <p>
+          App Created:{" "}
+          <a
+            className="font-semibold underline"
+            href="https://wa.me/+923313416850"
+            target="_blank"
+          >
+            Shoaib Abdul Sattar Khosa{" "}
+          </a>
+        </p>
+        <p>Vice Chairman (OMJ IT Committee)</p>
+        <p>Okhai Memon Jamat Social Welfare Committee</p>
+        <p className="text-mediumGray">
+          Serving the community with dedication since establishment
+        </p>
+        <p>© {new Date().getFullYear()} All Rights Reserved</p>
+      </footer>
     </div>
   );
 };

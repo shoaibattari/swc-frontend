@@ -1,66 +1,122 @@
-// src/components/landing/HeroSection.jsx
+// src/components/landing/HomePage.jsx (OMJ Fully Updated Version)
 import { useNavigate } from "react-router-dom";
-import { CommonButton, Wrapper } from "../../common";
-import { IoAddCircle } from "react-icons/io5";
-import { CiSearch } from "react-icons/ci";
+import { CommonButton } from "../../common";
 
-const HeroSection = () => {
+const HomePage = () => {
   const navigate = useNavigate();
+
   return (
-    <Wrapper>
-      <div className="min-h-screen flex flex-col justify-start items-center text-center">
-        <img src="./logo.png" alt="logo" className="h-32" />
+    <div className="w-full">
+      {/* Hero Section */}
+      <div className="flex flex-col justify-center items-center text-center bg-gradient-to-b from-green/10 to-white px-6 py-12">
+        {/* Official Logo */}
+        <img
+          src="./logo.png"
+          alt="Okhai Memon Jamat Social Welfare Committee Logo"
+          className="h-32 md:h-48 mb-4 animate-fade-in-scale drop-shadow-2xl"
+        />
 
-        {/* heading */}
-        <h1 className="text-[2.5rem] phone:text-[3rem] tablet:text-[4rem] laptop:text-[5rem] font-extrabold text-primary drop-shadow-lg animate-fade-in-scale">
-          COMING <span className="text-blue">SOON</span>
+        {/* Main Titles */}
+        <h1 className="text-4xl phone:text-5xl tablet:text-6xl laptop:text-7xl font-extrabold text-green">
+          OKHAI MEMON JAMAT
         </h1>
-        <h2 className="text-[1.8rem] phone:text-[2.5rem] tablet:text-[3rem] laptop:text-[4rem] font-nunito font-bold text-green animate-fade-in-right">
-          OKHAI MEMON JAMAT{" "}
-        </h2>
-        <h2 className="text-[1.8rem] phone:text-[2.5rem] tablet:text-[3rem] laptop:text-[4rem] font-nunito font-bold text-primary animate-fade-in-scale">
-          SOCIAL WELFARE <span className="text-blue"> COMMITTEE</span>
-        </h2>
-        <h2 className="text-[1.8rem] phone:text-[2.5rem] tablet:text-[3rem] laptop:text-[4rem] font-nunito font-bold text-grey animate-fade-in-right">
-          BIG <span className="text-orange">SURPRISE</span>
+        <h2 className="mt-3 text-3xl phone:text-4xl tablet:text-5xl laptop:text-6xl font-bold text-primary">
+          SOCIAL WELFARE COMMITTEE
         </h2>
 
-        <p className="text-mediumGray  text-base tablet:text-lg laptop:text-xl max-w-lg animate-fade-slide">
-          Something exciting is coming your way. Stay tuned!
+        {/* Tagline */}
+        <p className="mt-8 max-w-4xl text-lg phone:text-xl tablet:text-2xl laptop:text-3xl text-mediumGray animate-fade-slide">
+          Empowering the Okhai Memon Community through education, health, social
+          welfare, and youth initiatives since our foundation.
         </p>
-        <div className="flex flex-col tablet:flex-row justify-center items-center gap-2 pt-4">
-          <CommonButton
-            onClick={() => navigate("/course-form")}
-            rightIcon
-            variant="primary"
-            size="md"
-          >
-            Course Admission Form
-          </CommonButton>
+
+        {/* Hero Buttons */}
+        <div className="mt-12 flex flex-col tablet:flex-row gap-6 justify-center items-center">
           <CommonButton
             onClick={() => navigate("/event-form")}
-            rightIcon
-            variant="secondary"
-            size="md"
-          >
-            Event Registration Form
-          </CommonButton>
-          <CommonButton
-            onClick={() => navigate("/login")}
-            rightIcon
             variant="primary"
-            size="md"
+            size="lg"
+            className="min-w-[280px] py-4 hover:bg-green/90"
           >
-            Admin
+            Register for an Event
+          </CommonButton>
+
+          <CommonButton
+            onClick={() => navigate("/course-form")}
+            variant="secondary"
+            size="lg"
+            className="min-w-[280px] py-4 hover:bg-green/50"
+          >
+            Enroll in a Course
           </CommonButton>
         </div>
 
-        <div className="fixed bottom-0 text-sm bg-black/50 w-full py-5 text-white animate-fade-in-scale">
-          © {new Date().getFullYear()} — All Rights Reserved
+        {/* Admin Access */}
+        <div className="mt-6">
+          <CommonButton
+            onClick={() => navigate("/login")}
+            variant="primary"
+            size="md"
+            className="opacity-85 hover:opacity-100 transition-opacity"
+          >
+            Admin Portal
+          </CommonButton>
         </div>
       </div>
-    </Wrapper>
+
+      {/* Core Services Section */}
+      <div className="py-24 bg-lightBlue/30">
+        <h2 className="text-4xl laptop:text-5xl font-extrabold text-green text-center mb-16">
+          Our Core Services
+        </h2>
+        <div className="grid grid-cols-1 tablet:grid-cols-2 laptop:grid-cols-4 gap-10 max-w-7xl mx-auto px-6">
+          <div className="bg-white p-10 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in-scale group">
+            <div className="text-6xl mb-6">🎓</div>
+            <h3 className="text-2xl font-bold text-green mb-2">
+              Educational Programs
+            </h3>
+            <p className="text-mediumGray">
+              Skill-building workshops, IT courses, and awareness sessions for
+              youth and community members.
+            </p>
+          </div>
+
+          <div className="bg-white p-10 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in-scale delay-100 group">
+            <div className="text-6xl mb-6">🤝</div>
+            <h3 className="text-2xl font-bold text-green mb-2">
+              Community Welfare
+            </h3>
+            <p className="text-mediumGray">
+              Supporting social welfare, scholarships, and community development
+              projects for members in need.
+            </p>
+          </div>
+
+          <div className="bg-white p-10 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in-scale delay-200 group">
+            <div className="text-6xl mb-6">📋</div>
+            <h3 className="text-2xl font-bold text-green mb-2">
+              Event Management
+            </h3>
+            <p className="text-mediumGray">
+              Organizing community events, seminars, and competitions with
+              smooth registration and attendance tracking.
+            </p>
+          </div>
+
+          <div className="bg-white p-10 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-fade-in-scale delay-300 group">
+            <div className="text-6xl mb-6">🎟️</div>
+            <h3 className="text-2xl font-bold text-green mb-2">
+              Digital Entry & Participation
+            </h3>
+            <p className="text-mediumGray">
+              Secure digital entry passes and check-ins for events, workshops,
+              and welfare programs, ensuring smooth participation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default HeroSection;
+export default HomePage;
