@@ -6,7 +6,7 @@ const variants = {
   primary: "bg-primary text-white hover:bg-primary/50",
   secondary: "bg-green-500 text-white hover:opacity-50",
   success: "bg-green/50 text-white hover:bg-green/10",
-  danger: "bg-red/50 text-white hover:bg-red/10",
+  danger: "bg-red/90 text-white hover:bg-red/50",
   warning: "bg-yellow/50 text-white hover:bg-yellow/10",
   light: "bg-gray/10 text-gray-800 hover:bg-gray/10",
   dark: "bg-gray/80 text-white hover:bg-gray/40",

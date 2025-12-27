@@ -1,17 +1,19 @@
 import { CommonButton } from "../../components";
 import { useAuthContext } from "../../context/AuthContext";
 
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useNavigate } from "react-router-dom";
 import {
   AdminCampusScreen,
   AdminCourseScreen,
   AdminDashboardScreen,
   AdminEventScreen,
   AdminParticipantsScreen,
+  AdminSignupScreen,
 } from "../../views/admin";
 
 const AdminLayout = () => {
   const { logout } = useAuthContext();
+  const navigate = useNavigate();
 
   return (
     <div className="flex min-h-screen">
@@ -36,15 +38,25 @@ const AdminLayout = () => {
             Participants
           </Link>
         </nav>
-        <div className="mt-6">
-          <CommonButton onClick={logout}>Logout</CommonButton>
+        <div className="mt-6 flex flex-col space-y-2">
+          <CommonButton variant="danger" onClick={logout}>
+            Logout
+          </CommonButton>
+          <CommonButton onClick={() => navigate("/admin/signup")}>
+            Sign up
+          </CommonButton>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 p-6 bg-gray-100">
-        <div className="flex justify-end laptop-sm:hidden">
-          <CommonButton onClick={logout}>Logout</CommonButton>
+        <div className="flex justify-end gap-2 laptop-sm:hidden">
+          <CommonButton variant="danger" onClick={logout}>
+            Logout
+          </CommonButton>
+          <CommonButton onClick={() => navigate("/admin/signup")}>
+            Sign up
+          </CommonButton>
         </div>
         <Routes>
           <Route path="/*" element={<AdminDashboardScreen />} />
@@ -52,6 +64,7 @@ const AdminLayout = () => {
           <Route path="/campus" element={<AdminCampusScreen />} />
           <Route path="/events" element={<AdminEventScreen />} />
           <Route path="/participants" element={<AdminParticipantsScreen />} />
+          <Route path="/Signup" element={<AdminSignupScreen />} />
         </Routes>
       </main>
     </div>

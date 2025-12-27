@@ -15,6 +15,7 @@ const initialAppState = {
   courses: [],
   events: [],
   participants: [],
+  pagination: null,
   initialized: false,
 };
 
@@ -86,26 +87,30 @@ export const AppProvider = ({ children }) => {
     },
   });
 
-  const { mutate: fetchAllParticipants, isPending: fetchingParticipants } =
-    useMutation({
-      mutationFn: () => apis.getParticipants(),
-      onSuccess: ({ data }) => {
-        if (data?.status) {
-          setAppState((prev) => ({
-            ...prev,
-            participants: data?.data || [],
-            initialized: true,
-          }));
-        } else {
-          toast.error("Failed to load courses");
-          setAppState((prev) => ({ ...prev, initialized: true }));
-        }
-      },
-      onError: (error) => {
-        toast.error(error?.message || "Error fetching courses");
+  const {
+    mutate: fetchAllParticipants,
+    isPending: fetchingParticipants,
+  } = useMutation({
+    mutationFn: ({ search, page, limit }) =>
+      apis.getParticipants({ search, page, limit }),
+    onSuccess: ({ data }) => {
+      if (data?.status) {
+        setAppState((prev) => ({
+          ...prev,
+          participants: data?.data || [],
+          pagination: data?.pagination,
+          initialized: true,
+        }));
+      } else {
+        toast.error("Failed to load participants");
         setAppState((prev) => ({ ...prev, initialized: true }));
-      },
-    });
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Error fetching participants");
+      setAppState((prev) => ({ ...prev, initialized: true }));
+    },
+  });
 
   // ✅ Function to trigger initial data load
   const loadAppData = useCallback(() => {
@@ -113,7 +118,7 @@ export const AppProvider = ({ children }) => {
     fetchAllCourses();
     fetchAllEvents();
     fetchAllEvents();
-    fetchAllParticipants();
+    fetchAllParticipants({ search: "", page: 1, limit: 5 });
   }, [fetchAllCampuses, fetchAllCourses, fetchAllEvents, fetchAllParticipants]);
 
   // ✅ Load app data on mount
@@ -136,6 +141,7 @@ export const AppProvider = ({ children }) => {
         fetchingEvents,
         fetchAllEvents,
         participants: appState.participants,
+        pagination: appState.pagination,
         fetchingParticipants,
         fetchAllParticipants,
       }}

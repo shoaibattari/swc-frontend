@@ -19,19 +19,20 @@ const DynamicTable = ({
   totalPages,
   pageSize,
   setPageSize,
-  setSelectedSearch,
+  searchTerm,
+  setSearchTerm,
   placeholder = "Search...",
   rows = 5,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <div className="py-4 text-xs text-center laptop:text-sm desktop:text-sm _4k:text-base">
       {/* Search Bar & Row Selector */}
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start gap-1">
         <div className="w-full">
           {!hideSearchBar && (
-            <div className="flex gap-2 justify-start items-center mb-4 border border-border-grey px-4 py-2 drop-shadow-sm p-2 rounded w-1/3 outline-none">
+            <div className="flex gap-2 justify-start items-center mb-4 border border-border-grey px-4 py-2 drop-shadow-sm p-2 rounded laptop-sm:w-1/3 outline-none">
               <CiSearch size={20} className="text-[#262626]" />
               <input
                 type="text"

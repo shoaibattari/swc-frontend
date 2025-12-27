@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useAppContext } from "../../../context/AppContext";
 import { DynamicTable } from "../../common";
@@ -10,7 +11,41 @@ const ParticipantsTable = () => {
     participants,
     fetchAllParticipants,
     fetchingParticipants,
+    pagination,
   } = useAppContext();
+  console.log(pagination, "pagination");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  // -----------------------------
+  // Manual debounce for search
+  // -----------------------------
+  const debounceTimeout = useRef(null);
+  // Whenever searchTerm changes → reset page to 1 and fetch
+  useEffect(() => {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    debounceTimeout.current = setTimeout(() => {
+      setCurrentPage(1); // reset page to 1
+      fetchAllParticipants({
+        search: searchTerm,
+        page: 1,
+        limit: pageSize,
+      });
+    }, 500);
+
+    return () => clearTimeout(debounceTimeout.current);
+  }, [searchTerm, pageSize]);
+
+  // Whenever page changes → fetch the selected page
+  useEffect(() => {
+    fetchAllParticipants({
+      search: searchTerm,
+      page: currentPage,
+      limit: pageSize,
+    });
+  }, [currentPage, pageSize]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -18,7 +53,6 @@ const ParticipantsTable = () => {
         return "bg-red-500 text-red-50";
       case "Paid":
         return "bg-green-500 text-green-50";
-
       default:
         return "bg-gray-200 text-gray-400";
     }
@@ -28,27 +62,30 @@ const ParticipantsTable = () => {
     {
       mutationFn: ({ participantId, isAttend }) =>
         apis.markParticipantAttendance(participantId, { isAttend }),
-      onSuccess: () => {
-        toast.success("Attendance updated successfully!");
-        fetchAllParticipants?.(); // refresh participants after update
-      },
-      onError: (error) => {
-        toast.error(error?.message || "Failed to update attendance");
-      },
+      onSuccess: () =>
+        fetchAllParticipants({
+          search: searchTerm,
+          page: currentPage,
+          limit: pageSize,
+        }),
+      onError: (error) =>
+        toast.error(error?.message || "Failed to update attendance"),
     }
   );
 
   const { mutate: markPaid, isPending: markingPaid } = useMutation({
     mutationFn: ({ participantId, isPaid }) =>
       apis.markParticipantPaid(participantId, { isPaid }),
-    onSuccess: () => {
-      toast.success("Participant marked as Paid!");
-      fetchAllParticipants?.(); // refresh participants after update
-    },
-    onError: (error) => {
-      toast.error(error?.message || "Failed to mark participant as Paid");
-    },
+    onSuccess: () =>
+      fetchAllParticipants({
+        search: searchTerm,
+        page: currentPage,
+        limit: pageSize,
+      }),
+    onError: (error) =>
+      toast.error(error?.message || "Failed to mark participant as Paid"),
   });
+
   const columns = [
     { label: "ID", accessor: "participantId" },
     { label: "Event Name", accessor: "eventName" },
@@ -68,23 +105,19 @@ const ParticipantsTable = () => {
       label: "Status",
       accessor: "status",
       renderCell: (row) => (
-        <div className="flex flex-col items-start gap-2">
-          <button
-            onClick={() =>
-              markPaid({ participantId: row.id, isPaid: row.status !== "Paid" })
-            }
-            disabled={markingPaid}
-            className={`px-2 py-1 text-nowrap text-sm rounded ${getStatusColor(
-              row.status
-            )} transition `}
-          >
-            {row.status === "Paid"
-              ? "Paid"
-              : markingPaid
-              ? "Updating..."
-              : "Mark as Paid"}
-          </button>
-        </div>
+        <button
+          onClick={() =>
+            markPaid({ participantId: row.id, isPaid: row.status !== "Paid" })
+          }
+          disabled={markingPaid}
+          className={`px-2 py-1 text-sm rounded ${getStatusColor(row.status)}`}
+        >
+          {row.status === "Paid"
+            ? "Paid"
+            : markingPaid
+            ? "Updating..."
+            : "Mark as Paid"}
+        </button>
       ),
     },
     {
@@ -106,38 +139,44 @@ const ParticipantsTable = () => {
     },
   ];
 
-  // ✅ Transform participant data into table-ready format
-  const data = participants?.map((p) => {
-    return {
-      id: p._id,
-      participantId: p.participantId || "--",
-      fullName: p.fullName || "--",
-      fatherName: p.fatherName || "--",
-      gender: p.gender || "--",
-      address: p.address || "--",
-      contact: p.contact || "--",
-      email: p.email || "--",
-      community: p.community || "--",
-      cast: p.cast || "--",
-      cnic: p.cnic || "--",
-      category: p.category || "--",
-      eventName: p.event?.name || "--",
-      eventDate: p.event?.date
-        ? new Date(p.event.date).toLocaleDateString()
-        : "--",
-      venue: p.event?.venue || "--",
-      status: p.isPaid ? "Paid" : "Un-paid",
-      isAttend: p.isAttend || false,
-    };
-  });
+  // Transform participant data
+  const data = participants?.map((p) => ({
+    id: p._id,
+    participantId: p.participantId || "--",
+    fullName: p.fullName || "--",
+    fatherName: p.fatherName || "--",
+    gender: p.gender || "--",
+    address: p.address || "--",
+    contact: p.contact || "--",
+    email: p.email || "--",
+    community: p.community || "--",
+    cast: p.cast || "--",
+    cnic: p.cnic || "--",
+    category: p.category || "--",
+    eventName: p.event?.name || "--",
+    eventDate: p.event?.date
+      ? new Date(p.event.date).toLocaleDateString()
+      : "--",
+    venue: p.event?.venue || "--",
+    status: p.isPaid ? "Paid" : "Un-paid",
+    isAttend: p.isAttend || false,
+  }));
 
   return (
     <WhiteContainer>
       <DynamicTable
         hideSearchBar={false}
+        hidePageSize={true}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
         columns={columns}
         data={data}
         loading={fetchingParticipants}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalPages={pagination?.totalPages || 1}
+        pageSize={pageSize}
+        setPageSize={setPageSize}
       />
     </WhiteContainer>
   );
