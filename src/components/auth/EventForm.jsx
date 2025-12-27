@@ -65,7 +65,6 @@ const EventForm = () => {
   } = useMutation({
     mutationFn: (formData) => apis.registerParticipant(formData),
     onSuccess: (data) => {
-      fetchAllParticipants?.();
       setModalData(handleModalData(data?.data?.data));
       setIsModalOpen(true);
       toast.success("Registration successful!");

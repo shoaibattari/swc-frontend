@@ -8,7 +8,7 @@ const HomePage = () => {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <div className="flex flex-col justify-center items-center text-center bg-gradient-to-b from-green/10 to-white px-6 py-12">
+      <div className="flex flex-col justify-center items-center text-center bg-gradient-to-b from-green/10 to-white px-6 py-4 laptop-sm:py-12">
         {/* Official Logo */}
         <img
           src="./logo.png"
@@ -17,21 +17,21 @@ const HomePage = () => {
         />
 
         {/* Main Titles */}
-        <h1 className="text-4xl phone:text-5xl tablet:text-6xl laptop:text-7xl font-extrabold text-green">
+        <h1 className="text-3xl phone:text-5xl tablet:text-6xl laptop:text-7xl font-extrabold text-green">
           OKHAI MEMON JAMAT
         </h1>
-        <h2 className="mt-3 text-3xl phone:text-4xl tablet:text-5xl laptop:text-6xl font-bold text-primary">
+        <h2 className="mt-3 text-2xl phone:text-4xl tablet:text-5xl laptop:text-6xl font-bold text-primary">
           SOCIAL WELFARE COMMITTEE
         </h2>
 
         {/* Tagline */}
-        <p className="mt-8 max-w-4xl text-lg phone:text-xl tablet:text-2xl laptop:text-3xl text-mediumGray animate-fade-slide">
+        <p className="mt-4 max-w-4xl text-lg phone:text-xl tablet:text-2xl laptop:text-3xl text-mediumGray animate-fade-slide">
           Empowering the Okhai Memon Community through education, health, social
           welfare, and youth initiatives since our foundation.
         </p>
 
         {/* Hero Buttons */}
-        <div className="mt-12 flex flex-col tablet:flex-row gap-6 justify-center items-center">
+        <div className="mt-6 flex flex-col tablet:flex-row gap-6 justify-center items-center">
           <CommonButton
             onClick={() => navigate("/event-form")}
             variant="primary"
