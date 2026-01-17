@@ -12,6 +12,7 @@ const ParticipantsTable = () => {
     fetchAllParticipants,
     fetchingParticipants,
     pagination,
+    fetchStats,
   } = useAppContext();
   console.log(pagination, "pagination");
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,12 +63,17 @@ const ParticipantsTable = () => {
     {
       mutationFn: ({ participantId, isAttend }) =>
         apis.markParticipantAttendance(participantId, { isAttend }),
-      onSuccess: () =>
+
+      onSuccess: () => {
         fetchAllParticipants({
           search: searchTerm,
           page: currentPage,
           limit: pageSize,
-        }),
+        });
+
+        fetchStats(); // ✅ stats bhi refresh
+      },
+
       onError: (error) =>
         toast.error(error?.message || "Failed to update attendance"),
     }
@@ -76,12 +82,17 @@ const ParticipantsTable = () => {
   const { mutate: markPaid, isPending: markingPaid } = useMutation({
     mutationFn: ({ participantId, isPaid }) =>
       apis.markParticipantPaid(participantId, { isPaid }),
-    onSuccess: () =>
+
+    onSuccess: () => {
       fetchAllParticipants({
         search: searchTerm,
         page: currentPage,
         limit: pageSize,
-      }),
+      });
+
+      fetchStats(); // ✅ stats update
+    },
+
     onError: (error) =>
       toast.error(error?.message || "Failed to mark participant as Paid"),
   });
@@ -95,7 +106,19 @@ const ParticipantsTable = () => {
     { label: "Gender", accessor: "gender" },
     { label: "Address", accessor: "address" },
     { label: "Contact", accessor: "contact" },
-    { label: "Email", accessor: "email" },
+    {
+      label: "Email",
+      accessor: "email",
+      renderCell: (row) => (
+        <span
+          className="max-w-[120px] block truncate "
+          title={row.email} // hover pe full email
+        >
+          {row.email || "--"}
+        </span>
+      ),
+    },
+
     { label: "Community", accessor: "community" },
     { label: "Cast", accessor: "cast" },
     { label: "CNIC", accessor: "cnic" },
@@ -110,7 +133,9 @@ const ParticipantsTable = () => {
             markPaid({ participantId: row.id, isPaid: row.status !== "Paid" })
           }
           disabled={markingPaid}
-          className={`px-2 py-1 text-sm rounded ${getStatusColor(row.status)}`}
+          className={`px-2 py-1 text-sm rounded cursor-pointer hover:opacity-65 ${getStatusColor(
+            row.status
+          )}`}
         >
           {row.status === "Paid"
             ? "Paid"
@@ -129,7 +154,7 @@ const ParticipantsTable = () => {
             markAttendance({ participantId: row.id, isAttend: !row.isAttend })
           }
           disabled={updatingAttendance}
-          className={`px-2 py-1 text-sm rounded ${
+          className={`px-2 py-1 text-sm rounded cursor-pointer hover:opacity-65 ${
             row.isAttend ? "bg-green-500 text-white" : "bg-red-500 text-white"
           }`}
         >

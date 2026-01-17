@@ -13,6 +13,7 @@ const adminApi = (api) => ({
     api.patch(`/participant/${participantId}/payment-status`, body),
   markParticipantAttendance: (participantId, body) =>
     api.patch(`/participant/${participantId}/attendance`, body),
+  getStats: () => api.get("/participant/stats"),
 });
 
 export default adminApi;

@@ -23,6 +23,7 @@ const AppContext = createContext(initialAppState);
 
 export const AppProvider = ({ children }) => {
   const [appState, setAppState] = useState(initialAppState);
+  const [stats, setStats] = useState({});
 
   // ✅ Fetch all campuses
   const { mutate: fetchAllCampuses, isPending: fetchingCampuses } = useMutation(
@@ -112,6 +113,25 @@ export const AppProvider = ({ children }) => {
     },
   });
 
+  // ✅ Mutation to fetch stats
+  const { mutate: fetchStats, isLoading: statsLoading } = useMutation({
+    mutationFn: async () => {
+      const res = await apis.getStats(); // ensure async / Promise
+      return res;
+    },
+    onSuccess: (res) => {
+      if (res?.data?.status) {
+        setStats(res.data.data || {});
+      } else {
+        toast.error("Failed to fetch stats");
+        setStats({});
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Error fetching stats");
+      setStats({});
+    },
+  });
   // ✅ Function to trigger initial data load
   const loadAppData = useCallback(() => {
     fetchAllCampuses();
@@ -144,6 +164,10 @@ export const AppProvider = ({ children }) => {
         pagination: appState.pagination,
         fetchingParticipants,
         fetchAllParticipants,
+
+        stats,
+        statsLoading,
+        fetchStats,
       }}
     >
       {children}
