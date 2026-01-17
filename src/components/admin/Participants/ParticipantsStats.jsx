@@ -3,8 +3,10 @@ import { useAppContext } from "../../../context/AppContext";
 
 const StatsCard = ({ title, total, male, female, loading }) => {
   return (
-    <div className="bg-white shadow-md rounded-lg p-5 w-full ">
-      <h3 className="text-gray-700 font-semibold mb-4">{title}</h3>
+    <div className="bg-white shadow-md rounded-lg p-1 laptop-sm:p-3 w-full ">
+      <h3 className="text-gray-700 min-h-9 font-semibold text-xs laptop-sm:text-lg ">
+        {title}
+      </h3>
 
       {loading ? (
         <div className="space-y-2">
@@ -13,10 +15,23 @@ const StatsCard = ({ title, total, male, female, loading }) => {
           <div className="h-5 w-20 bg-gray-300 rounded animate-pulse"></div>
         </div>
       ) : (
-        <div className="space-y-1">
-          <p className="text-xl font-bold text-gray-900">Total: {total || 0}</p>
-          <p className="text-gray-600">Male: {male || 0}</p>
-          <p className="text-gray-600">Female: {female || 0}</p>
+        <div>
+          <p className="text-lg text-center laptop-sm:text-start laptop-sm:text-2xl font-bold text-green-900">
+            {total || 0}
+          </p>
+          <div className="flex justify-between items-center gap-1">
+            <p className="text-xs laptop-sm:text-base text-gray-600">Male: </p>
+            <p className="font-bold text-sm laptop-sm:text-xl"> {male || 0} </p>
+          </div>
+          <div className="flex justify-between items-center gap-1">
+            <p className="text-xs laptop-sm:text-base text-gray-600">
+              Female:{" "}
+            </p>
+            <p className="font-bold text-sm laptop-sm:text-xl">
+              {" "}
+              {female || 0}{" "}
+            </p>
+          </div>
         </div>
       )}
     </div>
