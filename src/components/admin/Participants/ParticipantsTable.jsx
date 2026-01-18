@@ -172,24 +172,40 @@ const ParticipantsTable = () => {
   const userColumns = [
     { label: "ID", accessor: "participantId" },
     { label: "Full Name", accessor: "fullName" },
-    { label: "Father Name", accessor: "fatherName" },
+    { label: "Father/ Husband Name", accessor: "fatherName" },
     { label: "Gender", accessor: "gender" },
     {
       label: "Attendance",
       accessor: "isAttend",
-      renderCell: (row) => (
-        <button
-          onClick={() =>
-            markAttendance({ participantId: row.id, isAttend: !row.isAttend })
+      renderCell: (row) => {
+        const isAbsent = !row.isAttend;
+        const canToggle = isAdmin || isAbsent;
+
+        return (
+          <button
+            onClick={() => {
+              if (canToggle) {
+                markAttendance({
+                  participantId: row.id,
+                  isAttend: !row.isAttend,
+                });
+              }
+            }}
+            disabled={!canToggle || updatingAttendance}
+            className={`px-2 py-1 text-sm rounded text-white
+          ${
+            row.isAttend
+              ? canToggle
+                ? "bg-green-500 cursor-pointer hover:opacity-70"
+                : "bg-green-500 cursor-not-allowed opacity-60"
+              : "bg-red-500 cursor-pointer hover:opacity-70"
           }
-          disabled={updatingAttendance}
-          className={`px-2 py-1 text-sm rounded cursor-pointer hover:opacity-65 ${
-            row.isAttend ? "bg-green-500 text-white" : "bg-red-500 text-white"
-          }`}
-        >
-          {row.isAttend ? "Present" : "Absent"}
-        </button>
-      ),
+        `}
+          >
+            {row.isAttend ? "Present" : "Absent"}
+          </button>
+        );
+      },
     },
   ];
 
