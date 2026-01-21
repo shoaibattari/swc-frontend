@@ -15,6 +15,7 @@ const initialAppState = {
   courses: [],
   events: [],
   participants: [],
+  students: [],
   pagination: null,
   initialized: false,
 };
@@ -24,6 +25,7 @@ const AppContext = createContext(initialAppState);
 export const AppProvider = ({ children }) => {
   const [appState, setAppState] = useState(initialAppState);
   const [stats, setStats] = useState({});
+  const [stuStats, setStuStats] = useState({});
 
   // ✅ Fetch all campuses
   const { mutate: fetchAllCampuses, isPending: fetchingCampuses } = useMutation(
@@ -113,6 +115,30 @@ export const AppProvider = ({ children }) => {
     },
   });
 
+  const { mutate: fetchAllStudents, isPending: fetchingStudents } = useMutation(
+    {
+      mutationFn: ({ search, page, limit }) =>
+        apis.getStudents({ search, page, limit }),
+      onSuccess: ({ data }) => {
+        if (data?.status) {
+          setAppState((prev) => ({
+            ...prev,
+            students: data?.data || [],
+            pagination: data?.pagination,
+            initialized: true,
+          }));
+        } else {
+          toast.error("Failed to load participants");
+          setAppState((prev) => ({ ...prev, initialized: true }));
+        }
+      },
+      onError: (error) => {
+        toast.error(error?.message || "Error fetching participants");
+        setAppState((prev) => ({ ...prev, initialized: true }));
+      },
+    }
+  );
+
   // ✅ Mutation to fetch stats
   const { mutate: fetchStats, isLoading: statsLoading } = useMutation({
     mutationFn: async () => {
@@ -132,6 +158,20 @@ export const AppProvider = ({ children }) => {
       setStats({});
     },
   });
+
+  // ---------------- STUDENT STATS (FIXED) ----------------
+  const { mutate: fetchStudentStats, isLoading: statsStuLoading } = useMutation(
+    {
+      mutationFn: () => apis.getStudentStats(),
+      onSuccess: ({ data }) => {
+        if (data?.status) setStuStats(data.data || {});
+        else toast.error("Failed to fetch student stats");
+      },
+      onError: (err) =>
+        toast.error(err?.message || "Error fetching student stats"),
+    }
+  );
+
   // ✅ Function to trigger initial data load
   const loadAppData = useCallback(() => {
     fetchAllCampuses();
@@ -164,10 +204,17 @@ export const AppProvider = ({ children }) => {
         pagination: appState.pagination,
         fetchingParticipants,
         fetchAllParticipants,
-
         stats,
         statsLoading,
         fetchStats,
+
+        students: appState.students,
+        fetchingStudents,
+        fetchAllStudents,
+
+        stuStats,
+        statsStuLoading,
+        fetchStudentStats,
       }}
     >
       {children}

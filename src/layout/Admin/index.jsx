@@ -9,6 +9,7 @@ import {
   AdminEventScreen,
   AdminParticipantsScreen,
   AdminSignupScreen,
+  AdminStudentssScreen,
 } from "../../views/admin";
 
 const AdminLayout = () => {
@@ -37,6 +38,9 @@ const AdminLayout = () => {
           <Link to="/admin/participants" className="block hover:underline">
             Participants
           </Link>
+          <Link to="/admin/students" className="block hover:underline">
+            Students
+          </Link>
         </nav>
         <div className="mt-6 flex flex-col space-y-2">
           <CommonButton variant="danger" onClick={logout}>
@@ -64,6 +68,8 @@ const AdminLayout = () => {
           <Route path="/campus" element={<AdminCampusScreen />} />
           <Route path="/events" element={<AdminEventScreen />} />
           <Route path="/participants" element={<AdminParticipantsScreen />} />
+          <Route path="/students" element={<AdminStudentssScreen />} />
+
           <Route path="/Signup" element={<AdminSignupScreen />} />
         </Routes>
       </main>

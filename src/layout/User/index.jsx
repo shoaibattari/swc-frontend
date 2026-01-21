@@ -5,6 +5,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import {
   UserDashboardScreen,
   UserParticipantsScreen,
+  UserStudentsScreen,
 } from "../../components/user";
 
 const UserLayout = () => {
@@ -22,6 +23,9 @@ const UserLayout = () => {
           <Link to="/user/participants" className="block hover:underline">
             Participants
           </Link>
+          <Link to="/user/students" className="block hover:underline">
+            Students
+          </Link>
         </nav>
         <div className="mt-6">
           <CommonButton onClick={logout}>Logout</CommonButton>
@@ -36,6 +40,7 @@ const UserLayout = () => {
         <Routes>
           <Route path="/*" element={<UserDashboardScreen />} />
           <Route path="/participants" element={<UserParticipantsScreen />} />
+          <Route path="/students" element={<UserStudentsScreen />} />
         </Routes>
       </main>
     </div>

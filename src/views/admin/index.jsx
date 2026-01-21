@@ -3,4 +3,5 @@ export { default as AdminCourseScreen } from "./Cousre";
 export { default as AdminDashboardScreen } from "./Dashboard";
 export { default as AdminEventScreen } from "./Events";
 export { default as AdminParticipantsScreen } from "./Participants";
+export { default as AdminStudentssScreen } from "./Students";
 export { default as AdminSignupScreen } from "../auth/Signup";

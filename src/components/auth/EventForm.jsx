@@ -149,10 +149,12 @@ const EventForm = () => {
                           setFieldValue("category", "");
                         }}
                         onBlur={handleBlur}
-                        options={events.map((e) => ({
-                          value: e._id,
-                          label: e.title || e.name,
-                        }))}
+                        options={events
+                          .filter((e) => e.status === "Registration Open")
+                          .map((e) => ({
+                            value: e._id,
+                            label: e.title || e.name,
+                          }))}
                         error={touched.event && errors.event}
                         placeholder="Choose an event"
                       />
