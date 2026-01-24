@@ -20,6 +20,11 @@ const adminApi = (api) => ({
       params: { search, page, limit },
     }),
   getStudentStats: () => api.get("/student/stats"),
+
+    markStudentPaid: (studentId, body) =>
+    api.patch(`/student/${studentId}/payment-status`, body),
+  markStudentAttendance: (studentId, body) =>
+    api.patch(`/student/${studentId}/attendance`, body),
 });
 
 export default adminApi;
