@@ -6,6 +6,13 @@ import WhiteContainer from "../../common/WhiteContainer";
 import apis from "../../../config/api";
 import { toast } from "react-toastify";
 import { useAuthContext } from "../../../context/AuthContext";
+import {
+  MdCheckCircle,
+  MdEvent,
+  MdPayment,
+  MdInfoOutline,
+  MdAccountCircle,
+} from "react-icons/md";
 
 const ParticipantsTable = () => {
   const { role } = useAuthContext();
@@ -20,29 +27,19 @@ const ParticipantsTable = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10); // Better for dashboard
 
-  // -----------------------------
-  // Manual debounce for search
-  // -----------------------------
+  // Debounce & Pagination Logic
   const debounceTimeout = useRef(null);
-  // Whenever searchTerm changes → reset page to 1 and fetch
   useEffect(() => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-
     debounceTimeout.current = setTimeout(() => {
-      setCurrentPage(1); // reset page to 1
-      fetchAllParticipants({
-        search: searchTerm,
-        page: 1,
-        limit: pageSize,
-      });
+      setCurrentPage(1);
+      fetchAllParticipants({ search: searchTerm, page: 1, limit: pageSize });
     }, 500);
-
     return () => clearTimeout(debounceTimeout.current);
   }, [searchTerm, pageSize]);
 
-  // Whenever page changes → fetch the selected page
   useEffect(() => {
     fetchAllParticipants({
       search: searchTerm,
@@ -51,157 +48,92 @@ const ParticipantsTable = () => {
     });
   }, [currentPage, pageSize]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Un-paid":
-        return "bg-red-500 text-red-50";
-      case "Paid":
-        return "bg-green-500 text-green-50";
-      default:
-        return "bg-gray-200 text-gray-400";
-    }
-  };
-
+  // Mutations
   const { mutate: markAttendance, isPending: updatingAttendance } = useMutation(
     {
       mutationFn: ({ participantId, isAttend }) =>
         apis.markParticipantAttendance(participantId, { isAttend }),
-
       onSuccess: () => {
         fetchAllParticipants({
           search: searchTerm,
           page: currentPage,
           limit: pageSize,
         });
-
-        fetchStats(); // ✅ stats bhi refresh
+        fetchStats();
       },
-
-      onError: (error) =>
-        toast.error(error?.message || "Failed to update attendance"),
+      onError: (error) => toast.error(error?.message || "Attendance failed"),
     }
   );
 
   const { mutate: markPaid, isPending: markingPaid } = useMutation({
     mutationFn: ({ participantId, isPaid }) =>
       apis.markParticipantPaid(participantId, { isPaid }),
-
     onSuccess: () => {
       fetchAllParticipants({
         search: searchTerm,
         page: currentPage,
         limit: pageSize,
       });
-
-      fetchStats(); // ✅ stats update
+      fetchStats();
     },
-
-    onError: (error) =>
-      toast.error(error?.message || "Failed to mark participant as Paid"),
+    onError: (error) => toast.error(error?.message || "Payment update failed"),
   });
 
-  // const columns = [
-  //   { label: "ID", accessor: "participantId" },
-  //   { label: "Event Name", accessor: "eventName" },
-  //   { label: "Category", accessor: "category" },
-  //   { label: "Full Name", accessor: "fullName" },
-  //   { label: "Father Name", accessor: "fatherName" },
-  //   { label: "Gender", accessor: "gender" },
-  //   { label: "Address", accessor: "address" },
-  //   { label: "Contact", accessor: "contact" },
-  //   {
-  //     label: "Email",
-  //     accessor: "email",
-  //     renderCell: (row) => (
-  //       <span
-  //         className="max-w-[120px] block truncate "
-  //         title={row.email} // hover pe full email
-  //       >
-  //         {row.email || "--"}
-  //       </span>
-  //     ),
-  //   },
-
-  //   { label: "Community", accessor: "community" },
-  //   { label: "Cast", accessor: "cast" },
-  //   { label: "CNIC", accessor: "cnic" },
-  //   { label: "Event Date", accessor: "eventDate" },
-  //   { label: "Venue", accessor: "venue" },
-  //   {
-  //     label: "Status",
-  //     accessor: "status",
-  //     renderCell: (row) => (
-  //       <button
-  //         onClick={() =>
-  //           markPaid({ participantId: row.id, isPaid: row.status !== "Paid" })
-  //         }
-  //         disabled={markingPaid}
-  //         className={`px-2 py-1 text-sm rounded cursor-pointer hover:opacity-65 ${getStatusColor(
-  //           row.status
-  //         )}`}
-  //       >
-  //         {row.status === "Paid"
-  //           ? "Paid"
-  //           : markingPaid
-  //           ? "Updating..."
-  //           : "Mark as Paid"}
-  //       </button>
-  //     ),
-  //   },
-  //   {
-  //     label: "Attendance",
-  //     accessor: "isAttend",
-  //     renderCell: (row) => (
-  //       <button
-  //         onClick={() =>
-  //           markAttendance({ participantId: row.id, isAttend: !row.isAttend })
-  //         }
-  //         disabled={updatingAttendance}
-  //         className={`px-2 py-1 text-sm rounded cursor-pointer hover:opacity-65 ${
-  //           row.isAttend ? "bg-green-500 text-white" : "bg-red-500 text-white"
-  //         }`}
-  //       >
-  //         {row.isAttend ? "Present" : "Absent"}
-  //       </button>
-  //     ),
-  //   },
-  // ];
-
-  // Transform participant data
-
+  // --- Premium Columns Design ---
   const userColumns = [
-    { label: "ID", accessor: "participantId" },
-    { label: "Full Name", accessor: "fullName" },
-    { label: "Father/ Husband Name", accessor: "fatherName" },
+    {
+      label: "ID",
+      accessor: "participantId",
+      renderCell: (row) => (
+        <span className="font-mono text-primary font-bold">
+          {row.participantId}
+        </span>
+      ),
+    },
+    {
+      label: "Participant",
+      accessor: "fullName",
+      renderCell: (row) => (
+        <div className="flex items-center gap-3">
+          <div className="hidden desktop:block w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-mediumGray">
+            <MdAccountCircle size={20} />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-grey capitalize leading-tight">
+              {row.fullName}
+            </span>
+            <span className="text-[10px] text-mediumGray">
+              S/O: {row.fatherName}
+            </span>
+          </div>
+        </div>
+      ),
+    },
     { label: "Gender", accessor: "gender" },
     {
       label: "Attendance",
       accessor: "isAttend",
       renderCell: (row) => {
-        const isAbsent = !row.isAttend;
-        const canToggle = isAdmin || isAbsent;
-
+        const canToggle = isAdmin || !row.isAttend;
         return (
           <button
-            onClick={() => {
-              if (canToggle) {
-                markAttendance({
-                  participantId: row.id,
-                  isAttend: !row.isAttend,
-                });
-              }
-            }}
+            onClick={() =>
+              canToggle &&
+              markAttendance({ participantId: row.id, isAttend: !row.isAttend })
+            }
             disabled={!canToggle || updatingAttendance}
-            className={`px-2 py-1 text-sm rounded text-white
-          ${
-            row.isAttend
-              ? canToggle
-                ? "bg-green-500 cursor-pointer hover:opacity-70"
-                : "bg-green-500 cursor-not-allowed opacity-60"
-              : "bg-red-500 cursor-pointer hover:opacity-70"
-          }
-        `}
+            className={`flex items-center gap-1.5 cursor-pointer px-3 py-1.5 rounded-full text-[11px] font-bold transition-all
+              ${
+                row.isAttend
+                  ? "bg-green-100 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100"
+              }`}
           >
+            {row.isAttend ? (
+              <MdCheckCircle size={14} />
+            ) : (
+              <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+            )}
             {row.isAttend ? "Present" : "Absent"}
           </button>
         );
@@ -210,26 +142,45 @@ const ParticipantsTable = () => {
   ];
 
   const adminExtraColumns = [
-    { label: "Event Name", accessor: "eventName" },
-    { label: "Category", accessor: "category" },
-    { label: "Address", accessor: "address" },
-    { label: "Contact", accessor: "contact" },
     {
-      label: "Email",
-      accessor: "email",
+      label: "Event Info",
+      accessor: "eventName",
       renderCell: (row) => (
-        <span className="max-w-[120px] block truncate" title={row.email}>
-          {row.email || "--"}
-        </span>
+        <div className="flex flex-col max-w-[150px]">
+          <span
+            className="font-bold text-xs text-grey truncate"
+            title={row.eventName}
+          >
+            {row.eventName}
+          </span>
+          <span className="text-[10px] text-primary font-medium">
+            {row.category}
+          </span>
+        </div>
       ),
     },
-    { label: "Community", accessor: "community" },
-    { label: "Cast", accessor: "cast" },
-    { label: "CNIC", accessor: "cnic" },
-    { label: "Event Date", accessor: "eventDate" },
-    { label: "Venue", accessor: "venue" },
     {
-      label: "Status",
+      label: "Contact & CNIC",
+      accessor: "cnic",
+      renderCell: (row) => (
+        <div className="flex flex-col gap-0.5 text-[11px]">
+          <span className="font-semibold text-grey">{row.contact}</span>
+          <span className="text-mediumGray">{row.cnic}</span>
+        </div>
+      ),
+    },
+    {
+      label: "Background",
+      accessor: "community",
+      renderCell: (row) => (
+        <div className="text-[11px]">
+          <span className="text-grey font-semibold">{row.community}</span>
+          <span className="text-mediumGray block text-[10px]">{row.cast}</span>
+        </div>
+      ),
+    },
+    {
+      label: "Fee Status",
       accessor: "status",
       renderCell: (row) => (
         <button
@@ -237,15 +188,19 @@ const ParticipantsTable = () => {
             markPaid({ participantId: row.id, isPaid: row.status !== "Paid" })
           }
           disabled={markingPaid}
-          className={`px-2 py-1 text-sm rounded cursor-pointer hover:opacity-65 ${getStatusColor(
-            row.status
-          )}`}
+          className={`flex items-center cursor-pointer justify-center gap-1 min-w-[100px] px-3 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter transition-all
+            ${
+              row.status === "Paid"
+                ? "bg-secondary/10 text-secondary"
+                : "bg-orange-50 text-orange-600 border border-orange-100"
+            }`}
         >
-          {row.status === "Paid"
-            ? "Paid"
-            : markingPaid
-            ? "Updating..."
-            : "Mark as Paid"}
+          {row.status === "Paid" ? (
+            <MdPayment size={14} />
+          ) : (
+            <MdInfoOutline size={14} />
+          )}
+          {row.status === "Paid" ? "Paid" : "Un-paid"}
         </button>
       ),
     },
@@ -278,22 +233,25 @@ const ParticipantsTable = () => {
   }));
 
   return (
-    <WhiteContainer>
-      <DynamicTable
-        hideSearchBar={false}
-        hidePageSize={true}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        columns={columns}
-        data={data}
-        loading={fetchingParticipants}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={pagination?.totalPages || 1}
-        pageSize={pageSize}
-        setPageSize={setPageSize}
-      />
-    </WhiteContainer>
+    <div className="animate-in fade-in slide-in-from-bottom-2 duration-700">
+      <WhiteContainer className="!p-0 overflow-hidden rounded-[2.5rem] border border-light-grey shadow-sm">
+        <DynamicTable
+          hideSearchBar={false}
+          hidePageSize={true}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          columns={columns}
+          data={data}
+          loading={fetchingParticipants}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={pagination?.totalPages || 1}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          placeholder="Search participant name, ID or CNIC..."
+        />
+      </WhiteContainer>
+    </div>
   );
 };
 

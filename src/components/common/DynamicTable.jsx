@@ -27,7 +27,7 @@ const DynamicTable = ({
   // const [searchTerm, setSearchTerm] = useState("");
 
   return (
-    <div className="py-4 text-xs text-center laptop:text-sm desktop:text-sm _4k:text-base">
+    <div className="p-4 text-xs text-center laptop:text-sm desktop:text-sm _4k:text-base">
       {/* Search Bar & Row Selector */}
       <div className="flex justify-between items-start gap-1">
         <div className="w-full">
@@ -98,26 +98,32 @@ const DynamicTable = ({
                 )}
               </tbody>
             </table>
-            <div className="block laptop:hidden">
+            {/* Mobile View - Cards Layout */}
+            <div className="block laptop:hidden space-y-4">
               {data?.length > 0 ? (
-                data.map((appointment, index) => (
+                data.map((row, index) => (
                   <div
                     key={index}
-                    className="p-2 rounded-lg border border-light-grey shadow-sm mb-2"
+                    className="bg-white p-5 rounded-2xl border border-light-grey shadow-sm hover:shadow-md transition-shadow duration-300"
                   >
-                    <div className="text-xs text-[#0D0D0D] grid grid-cols-2 gap-1 items-stretch">
+                    {/* Data Grid */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4">
                       {columns.map((col, colIndex) => (
                         <div
-                          className="flex flex-col items-start space-y-1"
+                          className={`flex flex-col items-start ${
+                            colIndex === columns.length - 1 ? "col-span-2" : ""
+                          }`}
                           key={colIndex}
                         >
-                          <p className="font-bold">{col.label}</p>
-                          <div className="text-start">
+                          <p className="text-[10px] uppercase font-bold text-mediumGray tracking-tight mb-1">
+                            {col.label}
+                          </p>
+                          <div className="text-xs font-semibold text-grey text-start break-words w-full">
                             {col.renderCell
-                              ? col.renderCell(appointment)
+                              ? col.renderCell(row)
                               : col.accessor === "userCount"
-                              ? appointment[col.accessor]?.length ?? "--"
-                              : appointment[col.accessor] ?? "--"}
+                              ? row[col.accessor]?.length ?? "--"
+                              : row[col.accessor] ?? "--"}
                           </div>
                         </div>
                       ))}
@@ -125,7 +131,7 @@ const DynamicTable = ({
                   </div>
                 ))
               ) : (
-                <div className="text-center text-sm w-full border !text-light-grey border-light-grey rounded-md">
+                <div className="text-center py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-light-grey text-mediumGray font-medium">
                   No data found
                 </div>
               )}

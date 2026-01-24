@@ -13,6 +13,7 @@ import {
   MdCastForEducation,
   MdAdminPanelSettings,
 } from "react-icons/md";
+import { useEffect, useState } from "react";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -90,10 +91,10 @@ const HomePage = () => {
 
       {/* Stats Section (Added for "Education" focus) */}
       <div className="max-w-5xl mx-auto px-6 -mt-12 mb-24 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard count="50+" label="Active Courses" />
-        <StatCard count="10k+" label="Community Members" />
-        <StatCard count="200+" label="Events Hosted" />
-        <StatCard count="1M+" label="Welfare Fund" />
+        <StatCard count="50 +" label="Active Courses" />
+        <StatCard count="10k +" label="Community Members" />
+        <StatCard count="200 +" label="Events Hosted" />
+        <StatCard count="1000k +" label="Welfare Fund" />
       </div>
 
       {/* Services Section with Video/Education Focus */}
@@ -140,12 +141,61 @@ const HomePage = () => {
   );
 };
 
-// Sub-components for better organization
+// --- Count Animation Logic ---
+const AnimatedCount = ({ value, duration = 1500 }) => {
+  // Extract only numbers from the string (e.g., "10k+" -> 10)
+  const numericValue = parseInt(value.replace(/[^0-9]/g, "")) || 0;
+  // Extract symbols (e.g., "10k+" -> "k+")
+  const suffix = value.replace(/[0-9]/g, "");
+
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+      // Easing function for smoother finish
+      const easeOutQuad = (t) => t * (2 - t);
+      const currentCount = Math.floor(easeOutQuad(progress) * numericValue);
+
+      setCount(currentCount);
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [numericValue, duration]);
+
+  return (
+    <span>
+      {count.toLocaleString()}
+      <span className="text-primary/80 ml-0.5">{suffix}</span>
+    </span>
+  );
+};
+
 const StatCard = ({ count, label }) => (
-  <div className="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-custom text-center border border-white/50">
-    <div className="text-3xl font-black text-green">{count}</div>
-    <div className="text-xs font-bold text-mediumGray uppercase tracking-widest mt-1">
-      {label}
+  <div className="group bg-white/70 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-sm border border-white/60 text-center transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:bg-white relative overflow-hidden">
+    {/* Subtle Animated Background Glow */}
+    <div className="absolute -inset-24 bg-gradient-to-br from-primary/10 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-3xl pointer-events-none" />
+
+    <div className="relative z-10">
+      <div className="text-4xl laptop-sm:text-5xl font-black text-grey tracking-tighter mb-2 group-hover:scale-110 transition-transform duration-500">
+        <AnimatedCount value={count} />
+      </div>
+
+      <div className="text-[10px] laptop-sm:text-[11px] font-black text-mediumGray uppercase tracking-[0.25em] leading-tight opacity-80 group-hover:opacity-100 transition-opacity">
+        {label}
+      </div>
+
+      {/* Modern Accent Bar */}
+      <div className="flex justify-center gap-1 mt-5">
+        <div className="w-1 h-1 bg-primary/20 rounded-full group-hover:scale-150 transition-all duration-300" />
+        <div className="w-8 h-1 bg-primary/10 rounded-full group-hover:w-16 group-hover:bg-primary/40 transition-all duration-500" />
+        <div className="w-1 h-1 bg-primary/20 rounded-full group-hover:scale-150 transition-all duration-300 delay-75" />
+      </div>
     </div>
   </div>
 );

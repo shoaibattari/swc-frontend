@@ -1,13 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-
 import { useAppContext } from "../../../context/AppContext";
 import { useAuthContext } from "../../../context/AuthContext";
-
 import { DynamicTable } from "../../common";
 import WhiteContainer from "../../common/WhiteContainer";
 import apis from "../../../config/api";
+import {
+  MdVerified,
+  MdError,
+  MdVisibility,
+  MdCheckCircle,
+} from "react-icons/md";
 
 const StudentsTable = () => {
   const { role } = useAuthContext();
@@ -18,36 +22,24 @@ const StudentsTable = () => {
     fetchAllStudents,
     fetchingStudents,
     pagination,
-    fetchStats,
+    fetchStudentStats,
   } = useAppContext();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10); // Default to 10 for better view
 
-  // -----------------------------
-  // Debounced Search
-  // -----------------------------
+  // Debounce & Pagination Logic (Same as before)
   const debounceTimeout = useRef(null);
-
   useEffect(() => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-
     debounceTimeout.current = setTimeout(() => {
       setCurrentPage(1);
-      fetchAllStudents({
-        search: searchTerm,
-        page: 1,
-        limit: pageSize,
-      });
+      fetchAllStudents({ search: searchTerm, page: 1, limit: pageSize });
     }, 500);
-
     return () => clearTimeout(debounceTimeout.current);
   }, [searchTerm, pageSize]);
 
-  // -----------------------------
-  // Pagination
-  // -----------------------------
   useEffect(() => {
     fetchAllStudents({
       search: searchTerm,
@@ -56,91 +48,90 @@ const StudentsTable = () => {
     });
   }, [currentPage, pageSize]);
 
-  // -----------------------------
-  // Helpers
-  // -----------------------------
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Paid":
-        return "bg-green-500 text-green-50";
-      case "Un-paid":
-        return "bg-red-500 text-red-50";
-      default:
-        return "bg-gray-200 text-gray-400";
-    }
-  };
-
-  // -----------------------------
-  // Attendance Mutation
-  // -----------------------------
+  // --- UI Mutations & Handlers ---
   const { mutate: markAttendance, isPending: updatingAttendance } = useMutation(
     {
       mutationFn: ({ studentId, isAttend }) =>
         apis.markStudentAttendance(studentId, { isAttend }),
-
       onSuccess: () => {
         fetchAllStudents({
           search: searchTerm,
           page: currentPage,
           limit: pageSize,
         });
-        fetchStats();
+        fetchStudentStats();
       },
-
       onError: (error) =>
-        toast.error(error?.message || "Failed to update attendance"),
+        toast.error(error?.message || "Attendance update failed"),
     }
   );
 
-  // -----------------------------
-  // Paid Mutation
-  // -----------------------------
   const { mutate: markPaid, isPending: markingPaid } = useMutation({
     mutationFn: ({ studentId, isPaid }) =>
       apis.markStudentPaid(studentId, { isPaid }),
-
     onSuccess: () => {
       fetchAllStudents({
         search: searchTerm,
         page: currentPage,
         limit: pageSize,
       });
-      fetchStats();
+      fetchStudentStats();
     },
-
-    onError: (error) =>
-      toast.error(error?.message || "Failed to mark student as paid"),
+    onError: (error) => toast.error(error?.message || "Payment update failed"),
   });
 
-  // -----------------------------
-  // Columns
-  // -----------------------------
+  // --- Enhanced Columns UI ---
   const userColumns = [
-    { label: "ID", accessor: "studentId" },
-    { label: "Full Name", accessor: "fullName" },
-    { label: "Father / Husband Name", accessor: "fatherName" },
+    {
+      label: "ID",
+      accessor: "studentId",
+      renderCell: (row) => (
+        <span className="font-mono text-primary font-bold">
+          {row.studentId}
+        </span>
+      ),
+    },
+    {
+      label: "Student Name",
+      accessor: "fullName",
+      renderCell: (row) => (
+        <div className="flex flex-col">
+          <span className="font-bold text-grey capitalize">{row.fullName}</span>
+          <span className="text-[10px] text-mediumGray">
+            S/O: {row.fatherName}
+          </span>
+        </div>
+      ),
+    },
     { label: "Gender", accessor: "gender" },
     {
       label: "Attendance",
       accessor: "isAttend",
       renderCell: (row) => {
         const canToggle = isAdmin || !row.isAttend;
-
         return (
-          <button
-            onClick={() =>
-              canToggle &&
-              markAttendance({
-                studentId: row.id,
-                isAttend: !row.isAttend,
-              })
-            }
-            disabled={!canToggle || updatingAttendance}
-            className={`px-2 py-1 text-sm rounded text-white
-              ${row.isAttend ? "bg-green-500" : "bg-red-500 hover:opacity-70"}`}
-          >
-            {row.isAttend ? "Present" : "Absent"}
-          </button>
+          <div className="flex justify-center items-center">
+            <button
+              onClick={() =>
+                canToggle &&
+                markAttendance({ studentId: row.id, isAttend: !row.isAttend })
+              }
+              disabled={!canToggle || updatingAttendance}
+              className={`flex items-center cursor-pointer gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all
+              ${
+                row.isAttend
+                  ? "bg-green-100 text-green-700 border border-green-200"
+                  : "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100"
+              }`}
+            >
+              {row.isAttend ? (
+                <MdCheckCircle size={14} />
+              ) : (
+                <div className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
+              )}
+              {row.isAttend ? "Present" : "Mark Present"}
+            </button>
+          </div>
         );
       },
     },
@@ -149,56 +140,64 @@ const StudentsTable = () => {
   const adminExtraColumns = [
     { label: "Contact", accessor: "contact" },
     {
-      label: "Email",
-      accessor: "email",
+      label: "Identity",
+      accessor: "cnic",
       renderCell: (row) => (
-        <span className="max-w-[140px] block truncate" title={row.email}>
-          {row.email || "--"}
-        </span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-xs font-medium text-grey">{row.cnic}</span>
+          <span className="text-[10px] text-mediumGray truncate max-w-[120px]">
+            {row.email}
+          </span>
+        </div>
       ),
     },
-    { label: "Community", accessor: "community" },
-    { label: "Cast", accessor: "cast" },
-    { label: "CNIC", accessor: "cnic" },
     {
-      label: "Payment Slip",
-      accessor: "paymentSlip",
-      renderCell: (row) => {
-        if (!row.paymentSlip?.url) {
-          return <span className="text-gray-400">No Slip</span>;
-        }
-
-        return (
-          <button
-            onClick={() => window.open(row.paymentSlip.url, "_blank")}
-            className="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:opacity-70"
-          >
-            View Slip
-          </button>
-        );
-      },
+      label: "Community",
+      accessor: "community",
+      renderCell: (row) => (
+        <div className="text-[11px]">
+          <span className="text-primary font-bold">{row.community}</span>
+          <span className="text-mediumGray"> ({row.cast})</span>
+        </div>
+      ),
     },
     {
-      label: "Status",
+      label: "Fee Slip",
+      accessor: "paymentSlip",
+      renderCell: (row) =>
+        row.paymentSlip?.url ? (
+          <button
+            onClick={() => window.open(row.paymentSlip.url, "_blank")}
+            className="flex items-center cursor-pointer gap-1 text-primary hover:underline font-bold text-xs"
+          >
+            <MdVisibility size={16} /> View Slip
+          </button>
+        ) : (
+          <span className="text-mediumGray/40 italic text-xs">No Slip</span>
+        ),
+    },
+    {
+      label: "Fee Status",
       accessor: "status",
       renderCell: (row) => (
         <button
           onClick={() =>
-            markPaid({
-              studentId: row.id,
-              isPaid: row.status !== "Paid",
-            })
+            markPaid({ studentId: row.id, isPaid: row.status !== "Paid" })
           }
           disabled={markingPaid || !row.paymentSlip?.url}
-          className={`px-2 py-1 text-sm rounded hover:opacity-70 ${getStatusColor(
-            row.status
-          )}`}
+          className={`flex items-center cursor-pointer hover:opacity-80 justify-center gap-1 min-w-[100px] px-3 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-tighter transition-all
+            ${
+              row.status === "Paid"
+                ? "bg-secondary/10 text-secondary"
+                : "bg-orange-50 text-orange-600 border border-orange-100"
+            }`}
         >
-          {row.status === "Paid"
-            ? "Paid"
-            : markingPaid
-            ? "Updating..."
-            : "Mark as Paid"}
+          {row.status === "Paid" ? (
+            <MdVerified size={14} />
+          ) : (
+            <MdError size={14} />
+          )}
+          {row.status === "Paid" ? "Verified" : "Pending"}
         </button>
       ),
     },
@@ -208,12 +207,9 @@ const StudentsTable = () => {
     ? [...userColumns, ...adminExtraColumns]
     : userColumns;
 
-  // -----------------------------
-  // Normalize Data
-  // -----------------------------
   const tableData = students?.map((s) => ({
     id: s._id,
-    studentId: s.studentId || "--",
+    studentId: s.studentId || "N/A",
     fullName: s.fullName || "--",
     fatherName: s.fatherName || "--",
     gender: s.gender || "--",
@@ -228,22 +224,25 @@ const StudentsTable = () => {
   }));
 
   return (
-    <WhiteContainer>
-      <DynamicTable
-        hideSearchBar={false}
-        hidePageSize={true}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        columns={columns}
-        data={tableData}
-        loading={fetchingStudents}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        totalPages={pagination?.totalPages || 1}
-        pageSize={pageSize}
-        setPageSize={setPageSize}
-      />
-    </WhiteContainer>
+    <div className="animate-in fade-in duration-500">
+      <WhiteContainer className="!p-0 overflow-hidden rounded-[2rem] border border-light-grey">
+        <DynamicTable
+          hideSearchBar={false}
+          hidePageSize={true}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          columns={columns}
+          data={tableData}
+          loading={fetchingStudents}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={pagination?.totalPages || 1}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          placeholder="Search by name, ID or CNIC..."
+        />
+      </WhiteContainer>
+    </div>
   );
 };
 
